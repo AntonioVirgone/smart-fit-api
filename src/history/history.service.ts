@@ -20,6 +20,11 @@ export class HistoryService {
       status: saveJsonDto.status || 'completed',
     };
 
+    const stringaJSON = JSON.stringify(createHistoryDto);
+    const stringaUnita = 'Prepare element to save: ' + stringaJSON;
+
+    console.log(stringaUnita);
+
     const history = this.historyRepository.create(createHistoryDto);
     return await this.historyRepository.save(history);
   }
