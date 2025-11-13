@@ -7,7 +7,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
-  ParseIntPipe
+  ParseIntPipe,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { SaveJsonDto } from './dto/save-json.dto';
@@ -49,7 +49,9 @@ export class HistoryController {
   }
 
   @Get(':id')
-  async findById(@Param('id', ParseIntPipe) id: number): Promise<{ message: string; data: History | null }> {
+  async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string; data: History | null }> {
     const history = await this.historyService.findById(id);
 
     return {
@@ -66,6 +68,16 @@ export class HistoryController {
 
     return {
       message: 'Record della history eliminato con successo',
+    };
+  }
+
+  @Delete()
+  async deleteAll(): Promise<{
+    message: string;
+  }> {
+    await this.historyService.deleteAll();
+    return {
+      message: 'Record della history eliminati con successo',
     };
   }
 }

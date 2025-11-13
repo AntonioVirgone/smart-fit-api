@@ -37,4 +37,8 @@ export class HistoryService {
   async delete(id: number): Promise<void> {
     await this.historyRepository.delete(id);
   }
+
+  async deleteAll(): Promise<void> {
+    await this.historyRepository.deleteAll();
+  }
 }
