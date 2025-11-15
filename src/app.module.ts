@@ -1,20 +1,33 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryModule } from './history/history.module';
+import { UsersModule } from './users/users.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres', // o 'mysql', 'sqlite', ecc.
-      host: 'dpg-d49rb5v5r7bs73e1sqd0-a',
-      port: 5432,
-      username: 'smart_fit_db_user',
-      password: 'QB6i1s6wrduz6qE8MCzEJ9bk78t34lka',
-      database: 'smart_fit_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Solo per sviluppo - disattivare in produzione
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'production'
+        ? '.env.production'
+        : '.env',
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get('DB_HOST'),
+        port: config.get('DB_PORT'),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_NAME'),
+        autoLoadEntities: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: true, // Solo per sviluppo - disattivare in produzione
+      }),
+      inject: [ConfigService],
     }),
     HistoryModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
