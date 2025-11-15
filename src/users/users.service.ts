@@ -35,6 +35,12 @@ export class UsersService {
     });
   }
 
+  async findUserByCredential(username: string, password: string) {
+    return await this.userRepository.findOne({
+      where: { username, password },
+    });
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }

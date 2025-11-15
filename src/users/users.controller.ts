@@ -13,12 +13,13 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto): Promise<{
     message: string;
@@ -32,6 +33,15 @@ export class UsersController {
       data: user,
       id: user.id,
     };
+  }
+
+  @Post('signin')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginUserDto: LoginUserDto) {
+    return await this.usersService.findUserByCredential(
+      loginUserDto.username,
+      loginUserDto.password,
+    );
   }
 
   @Get()
