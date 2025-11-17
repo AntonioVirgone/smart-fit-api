@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -13,20 +14,15 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newCreateUserDto: CreateUserDto = {
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    const newUser = this.userRepository.create({
       username: createUserDto.username,
-      password: createUserDto.password,
+      password: hashedPassword,
       email: createUserDto.email,
-      type: createUserDto.type,
-    };
+    });
 
-    const stringaJSON = JSON.stringify(newCreateUserDto);
-    const stringaUnita = 'Prepare element to save: ' + stringaJSON;
-
-    console.log(stringaUnita);
-
-    const user = this.userRepository.create(newCreateUserDto);
-    return await this.userRepository.save(user);
+    return await this.userRepository.save(newUser);
   }
 
   async findAll() {
@@ -36,9 +32,19 @@ export class UsersService {
   }
 
   async findUserByCredential(username: string, password: string) {
-    return await this.userRepository.findOne({
-      where: { username, password },
-    });
+    const user = await this.userRepository.findOne({ where: { username } });
+
+    if (!user) {
+      return null;
+    }
+
+    const isValid = await bcrypt.compare(password, user.password); // user.password è hashata
+
+    if (!isValid) {
+      return null;
+    }
+
+    return user;
   }
 
   findOne(id: number) {
@@ -51,5 +57,17 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async updateRefreshToken(id: number, refreshToken: string | null) {
+    await this.userRepository.update(id, { refreshToken });
+  }
+
+  async findByUsername(username: string) {
+    return this.userRepository.findOne({ where: { username } });
+  }
+
+  async findById(id: number) {
+    return this.userRepository.findOne({ where: { id } });
   }
 }

@@ -22,6 +22,9 @@ export class User {
   @Column({ type: 'varchar', length: 50, default: 'CONSUMER' })
   type: string;
 
+  @Column({ type: 'text', nullable: true })
+  refreshToken?: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 }

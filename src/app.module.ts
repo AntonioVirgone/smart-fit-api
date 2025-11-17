@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryModule } from './history/history.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -10,6 +12,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       isGlobal: true,
       envFilePath:
         process.env.NODE_ENV === 'production' ? '.env.production' : '.env',
+    }),
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
@@ -27,6 +36,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     HistoryModule,
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
