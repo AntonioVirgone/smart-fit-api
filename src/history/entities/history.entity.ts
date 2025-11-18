@@ -10,6 +10,9 @@ export class History {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 255 })
+  customerId: string;
+
   @Column({ type: 'json', nullable: true })
   json_data: any;
 

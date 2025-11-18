@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +17,12 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
+    console.log('******** create new user ********');
+    console.log(createUserDto.password);
+    console.log(hashedPassword);
+
     const newUser = this.userRepository.create({
+      customerId: uuidv4(),
       username: createUserDto.username,
       password: hashedPassword,
       email: createUserDto.email,
@@ -31,16 +37,11 @@ export class UsersService {
     });
   }
 
-  async findUserByCredential(username: string, password: string) {
+  async findUserByCredential(username: string) {
     const user = await this.userRepository.findOne({ where: { username } });
 
+    console.log(user);
     if (!user) {
-      return null;
-    }
-
-    const isValid = await bcrypt.compare(password, user.password); // user.password è hashata
-
-    if (!isValid) {
       return null;
     }
 
@@ -57,6 +58,10 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async removeAll() {
+    return this.userRepository.deleteAll();
   }
 
   async updateRefreshToken(id: number, refreshToken: string | null) {

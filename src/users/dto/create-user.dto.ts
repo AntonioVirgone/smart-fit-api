@@ -11,6 +11,10 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  customerId: string;
+
+  @IsString()
+  @IsOptional()
   email?: string;
 
   @IsString()

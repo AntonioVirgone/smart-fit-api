@@ -12,8 +12,12 @@ export class HistoryService {
     private readonly historyRepository: Repository<History>,
   ) {}
 
-  async saveJson(saveJsonDto: SaveJsonDto): Promise<History> {
+  async saveJson(
+    customerId: string,
+    saveJsonDto: SaveJsonDto,
+  ): Promise<History> {
     const createHistoryDto: CreateHistoryDto = {
+      customerId: customerId,
       json_data: saveJsonDto.jsonData,
       filename: saveJsonDto.filename || 'unknown.json',
       data_size: JSON.stringify(saveJsonDto.jsonData).length,
@@ -33,6 +37,10 @@ export class HistoryService {
     return await this.historyRepository.find({
       order: { created_at: 'DESC' },
     });
+  }
+
+  async findByCustomerId(customerId: string): Promise<History[]> {
+    return await this.historyRepository.find({ where: { customerId } });
   }
 
   async findById(id: number): Promise<History | null> {

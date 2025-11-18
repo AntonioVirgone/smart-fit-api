@@ -8,23 +8,33 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { SaveJsonDto } from './dto/save-json.dto';
 import { History } from './entities/history.entity';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 
 @Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('save-json')
   @HttpCode(HttpStatus.CREATED)
-  async saveJson(@Body() saveJsonDto: SaveJsonDto): Promise<{
+  async saveJson(
+    @Req() req,
+    @Body() saveJsonDto: SaveJsonDto,
+  ): Promise<{
     message: string;
     data: History;
     id: number;
   }> {
-    const history = await this.historyService.saveJson(saveJsonDto);
+    const history = await this.historyService.saveJson(
+      req.user.customerId,
+      saveJsonDto,
+    );
 
     return {
       message: 'JSON salvato con successo nella history',
@@ -33,14 +43,32 @@ export class HistoryController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(): Promise<{
+  async findAll(@Req() req): Promise<{
     message: string;
     data: History[];
     count: number;
   }> {
-    const history = await this.historyService.findAll();
+    if (req.user.role === 'admin') {
+      const history = await this.historyService.findAll();
+      return {
+        message: 'Lista della history recuperata con successo',
+        data: history,
+        count: history.length,
+      };
+    }
+    return {
+      message: 'Lista della history recuperata con successo',
+      data: [],
+      count: 0,
+    };
+  }
 
+  @UseGuards(JwtAuthGuard)
+  @Get(':customerId/user')
+  async findOne(@Req() req, @Param('customerId') customerId: string) {
+    const history = await this.historyService.findByCustomerId(customerId);
     return {
       message: 'Lista della history recuperata con successo',
       data: history,

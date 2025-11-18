@@ -26,6 +26,7 @@ export class UsersController {
     data: User;
     id: number;
   }> {
+    console.log(createUserDto);
     const user = await this.usersService.create(createUserDto);
 
     return {
@@ -38,10 +39,7 @@ export class UsersController {
   @Post('signin')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.usersService.findUserByCredential(
-      loginUserDto.username,
-      loginUserDto.password,
-    );
+    return await this.usersService.findUserByCredential(loginUserDto.username);
   }
 
   @Get()
@@ -62,5 +60,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Delete()
+  removeAll() {
+    return this.usersService.removeAll();
   }
 }

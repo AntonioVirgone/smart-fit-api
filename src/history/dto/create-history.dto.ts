@@ -1,6 +1,9 @@
 import { IsObject, IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class CreateHistoryDto {
+  @IsString()
+  customerId: string;
+
   @IsObject()
   json_data: any;
 

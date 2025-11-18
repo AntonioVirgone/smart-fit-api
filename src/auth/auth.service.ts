@@ -12,10 +12,7 @@ export class AuthService {
   ) {}
 
   async login(username: string, password: string) {
-    const user = await this.usersService.findUserByCredential(
-      username,
-      password,
-    );
+    const user = await this.usersService.findUserByCredential(username);
     if (!user) throw new UnauthorizedException('User not found');
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -26,7 +23,12 @@ export class AuthService {
   }
 
   async generateTokens(user: User) {
-    const payload = { sub: user.id, username: user.username };
+    const customerId = user.customerId;
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      customerId: user.customerId,
+    };
 
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '15m',
@@ -39,8 +41,7 @@ export class AuthService {
     // Salviamo l’hash del refresh token nel DB
     const hashedRefresh = await bcrypt.hash(refreshToken, 10);
     await this.usersService.updateRefreshToken(user.id, hashedRefresh);
-
-    return { accessToken, refreshToken };
+    return { customerId, accessToken, refreshToken };
   }
 
   async refreshToken(token: string) {
