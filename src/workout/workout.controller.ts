@@ -1,15 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { WorkoutService } from './workout.service';
 import { CreateWorkoutDto } from './dto/create-workout.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 
 @Controller('workout')
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
-  @Post()
-  create(@Body() createWorkoutDto: CreateWorkoutDto) {
-    return this.workoutService.create(createWorkoutDto);
+  @UseGuards(JwtAuthGuard)
+  @Post(':customerId/user')
+  async create(
+    @Param('customerId') customerId: string,
+    @Body() createWorkoutDto: CreateWorkoutDto,
+  ) {
+    return await this.workoutService.create(customerId, createWorkoutDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':customerId/user')
+  async find(@Param('customerId') customerId: string) {
+    return await this.workoutService.findByCustomerId(customerId);
   }
 
   @Get()
