@@ -48,6 +48,7 @@ export class WorkoutService {
     });
 
     if (!workout) {
+      console.log('Workout does not exist');
       throw new NotFoundException();
     }
     return workout;
