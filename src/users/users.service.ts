@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,29 +6,41 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private readonly mailService: MailService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    console.log('******** create new user ********');
-    console.log(createUserDto.password);
-    console.log(hashedPassword);
+    const codeValidator = crypto.randomUUID();
+    console.log(codeValidator); // '398de222-5bf9-4754-8e3e-011a55307014'
 
     const newUser = this.userRepository.create({
       customerId: uuidv4(),
       username: createUserDto.username,
       password: hashedPassword,
       email: createUserDto.email,
+      codeValidator: codeValidator,
     });
 
-    return await this.userRepository.save(newUser);
+    const user = await this.userRepository.save(newUser);
+
+    if (!user) {
+      throw new BadRequestException('User not created');
+    }
+
+    if (createUserDto.email && createUserDto.email.trim() !== '') {
+      await this.mailService.sendTestEmail(createUserDto.email, codeValidator);
+    }
+
+    return user;
   }
 
   async findAll() {

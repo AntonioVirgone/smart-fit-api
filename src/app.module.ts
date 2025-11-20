@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkoutModule } from './workout/workout.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WorkoutModule } from './workout/workout.module';
     UsersModule,
     AuthModule,
     WorkoutModule,
+    MailModule,
   ],
 })
 export class AppModule {}

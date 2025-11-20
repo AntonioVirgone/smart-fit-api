@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('User')
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,6 +27,12 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   refreshToken?: string | null;
+
+  @Column({ type: 'varchar', length: 255 })
+  codeValidator?: string | null;
+
+  @Column({ type: 'varchar', length: 255, default: 'INACTIVE' })
+  status?: string;
 
   @CreateDateColumn()
   created_at: Date;
