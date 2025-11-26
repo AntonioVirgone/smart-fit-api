@@ -5,11 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Workout } from './entities/workout.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { Exercise } from './entities/exercise.entity';
-import { Day } from './entities/day.entity';
-import { CreateDayByExerciseCode } from './dto/create-day-by-excercise-code.dto';
-import { ExerciseService } from '../exercise/exercise.service';
-import { CreateExerciseDto } from '../exercise/dto/create-exercise.dto';
+import { Exercise } from '../exercise/entities/exercise.entity';
 
 @Injectable()
 export class WorkoutService {
@@ -18,45 +14,7 @@ export class WorkoutService {
     private workoutRepository: Repository<Workout>,
     @InjectRepository(Exercise)
     private exerciseRepository: Repository<Exercise>,
-    @InjectRepository(Day)
-    private dayRepository: Repository<Day>,
-    private readonly exerciseService: ExerciseService,
   ) {}
-
-  async createExercise(ex: CreateExerciseDto) {
-    const exercise = this.exerciseRepository.create({
-      name: ex.name,
-      description: ex.description,
-      imageName: ex.imageName,
-      muscleGroup: ex.muscleGroup,
-      sets: ex.sets,
-      repetitions: ex.repetitions,
-      recovery: ex.recovery,
-      instructions: ex.instructions,
-    });
-
-    return await this.exerciseRepository.save(exercise);
-  }
-
-  async createDayByExCode(day: CreateDayByExerciseCode) {
-    const exercises: Exercise[] = [];
-
-    for (const id of day.exercises) {
-      const exercise = await this.exerciseRepository.findOne({ where: { id } });
-      if (!exercise) {
-        throw new NotFoundException(`Exercise with id ${id} not found`);
-      }
-      exercises.push(exercise);
-    }
-
-    // Creiamo il giorno
-    const newDay = this.dayRepository.create({
-      name: day.name,
-      exercises: exercises,
-    });
-
-    return await this.dayRepository.save(newDay);
-  }
 
   async create(customerId: string, dto: CreateWorkoutDto): Promise<Workout> {
     const workout = this.workoutRepository.create({

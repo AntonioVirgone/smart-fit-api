@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { CreateDayDto } from './create-day.dto';
+import { CreatePlanDto } from '../../plan/dto/create-plan.dto';
 
 export class CreateWorkoutDto {
   @IsNotEmpty()
@@ -9,6 +9,6 @@ export class CreateWorkoutDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateDayDto)
-  days: CreateDayDto[];
+  @Type(() => CreatePlanDto)
+  days: CreatePlanDto[];
 }

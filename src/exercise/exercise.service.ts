@@ -2,9 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Exercise } from '../workout/entities/exercise.entity';
 import { In, Repository } from 'typeorm';
-import { raw } from 'express';
+import { Exercise } from './entities/exercise.entity';
 
 @Injectable()
 export class ExerciseService {

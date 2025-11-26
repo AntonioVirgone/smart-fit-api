@@ -13,18 +13,12 @@ import { CreateWorkoutDto } from './dto/create-workout.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateDayByExerciseCode } from './dto/create-day-by-excercise-code.dto';
+import { CreatePlanByExerciseCode } from '../plan/dto/create-plan-by-excercise-code.dto';
 
 @ApiTags('workout')
 @Controller('workout')
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
-
-  @Post('day')
-  @ApiOperation({ summary: 'Create day' })
-  async day(@Body() createDayDto: CreateDayByExerciseCode) {
-    return await this.workoutService.createDayByExCode(createDayDto);
-  }
 
   @UseGuards(JwtAuthGuard)
   @Post(':customerId/user')

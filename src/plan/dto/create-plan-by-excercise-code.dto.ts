@@ -1,6 +1,6 @@
 import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class CreateDayByExerciseCode {
+export class CreatePlanByExerciseCode {
   @IsNotEmpty()
   @IsString()
   name: string;

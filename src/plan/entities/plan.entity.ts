@@ -1,9 +1,15 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Workout } from './workout.entity';
-import { Exercise } from './exercise.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Workout } from '../../workout/entities/workout.entity';
+import { Exercise } from '../../exercise/entities/exercise.entity';
 
 @Entity()
-export class Day {
+export class Plan {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

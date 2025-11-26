@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Day } from './day.entity';
+import { Plan } from '../../plan/entities/plan.entity';
 
 @Entity()
 export class Workout {
@@ -12,9 +12,9 @@ export class Workout {
   @Column({ type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @OneToMany(() => Day, (day) => day.workout, {
+  @OneToMany(() => Plan, (plan) => plan.workout, {
     cascade: true,
     eager: true,
   })
-  days: Day[];
+  days: Plan[];
 }
