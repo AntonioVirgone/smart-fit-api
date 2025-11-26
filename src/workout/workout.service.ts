@@ -5,11 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Workout } from './entities/workout.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { Exercise } from './entities/exercise.entity';
 import { Day } from './entities/day.entity';
 import { CreateDayByExerciseCode } from './dto/create-day-by-excercise-code.dto';
-import { ExerciseService } from './exercise.service';
+import { ExerciseService } from '../exercise/exercise.service';
+import { CreateExerciseDto } from '../exercise/dto/create-exercise.dto';
 
 @Injectable()
 export class WorkoutService {
