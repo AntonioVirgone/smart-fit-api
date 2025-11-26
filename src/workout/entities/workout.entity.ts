@@ -7,14 +7,10 @@ export class Workout {
   id: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  customerId: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
   name: string;
 
   @OneToMany(() => Plan, (plan) => plan.workout, {
-    cascade: true,
     eager: true,
   })
-  days: Plan[];
+  plans: Plan[];
 }

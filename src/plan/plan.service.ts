@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdatePlanDto } from './dto/update-plan.dto';
 import { CreatePlanByExerciseCode } from './dto/create-plan-by-excercise-code.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -16,10 +15,10 @@ export class PlanService {
     private planRepository: Repository<Plan>,
   ) {}
 
-  async createDayByExCode(day: CreatePlanByExerciseCode) {
+  async createPlanByExCode(createPlanByExerciseCode: CreatePlanByExerciseCode) {
     const exercises: Exercise[] = [];
 
-    for (const id of day.exercises) {
+    for (const id of createPlanByExerciseCode.exercises) {
       const exercise = await this.exerciseRepository.findOne({ where: { id } });
       if (!exercise) {
         throw new NotFoundException(`Exercise with id ${id} not found`);
@@ -28,12 +27,12 @@ export class PlanService {
     }
 
     // Creiamo il giorno
-    const newDay = this.planRepository.create({
-      name: day.name,
+    const plan = this.planRepository.create({
+      name: createPlanByExerciseCode.name,
       exercises: exercises,
     });
 
-    return await this.planRepository.save(newDay);
+    return await this.planRepository.save(plan);
   }
 
   async addExerciseToPlan(planCode: string, addExerciseDto: AddExerciseDto) {
@@ -92,11 +91,7 @@ export class PlanService {
     return await this.planRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updatePlanDto: UpdatePlanDto) {
-    return `This action updates a #${id} plan`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} plan`;
+  async removeAll() {
+    return await this.planRepository.deleteAll();
   }
 }

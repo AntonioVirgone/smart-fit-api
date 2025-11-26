@@ -1,27 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateWorkoutDto } from './dto/create-workout.dto';
-import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Workout } from './entities/workout.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { Exercise } from '../exercise/entities/exercise.entity';
+import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
+import { Plan } from '../plan/entities/plan.entity';
 
 @Injectable()
 export class WorkoutService {
   constructor(
     @InjectRepository(Workout)
     private workoutRepository: Repository<Workout>,
-    @InjectRepository(Exercise)
-    private exerciseRepository: Repository<Exercise>,
+    @InjectRepository(Plan)
+    private planRepository: Repository<Plan>,
   ) {}
 
+  /*
   async create(customerId: string, dto: CreateWorkoutDto): Promise<Workout> {
     const workout = this.workoutRepository.create({
       id: uuidv4(),
       customerId: customerId,
       name: dto.name,
-      days: dto.days.map((day) => ({
+      plans: dto.days.map((day) => ({
         name: day.name,
         exercises: day.exercises.map((ex) => ({
           name: ex.name,
@@ -49,20 +48,35 @@ export class WorkoutService {
     }
     return workout;
   }
+*/
+
+  async createWorkoutByPlanCode(
+    createWorkoutByPlanCode: CreateWorkoutByPlanCodeDto,
+  ) {
+    const plans: Plan[] = [];
+
+    for (const id of createWorkoutByPlanCode.plans) {
+      const plan = await this.planRepository.findOne({ where: { id } });
+      if (!plan) {
+        throw new NotFoundException(`Exercise with id ${id} not found`);
+      }
+      plans.push(plan);
+    }
+
+    // Creiamo il giorno
+    const workout = this.workoutRepository.create({
+      name: createWorkoutByPlanCode.name,
+      plans: plans,
+    });
+
+    return await this.workoutRepository.save(workout);
+  }
 
   async findAll() {
     return await this.workoutRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} workout`;
-  }
-
-  update(id: number, updateWorkoutDto: UpdateWorkoutDto) {
-    return `This action updates a #${id} workout`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} workout`;
+  async removeAll() {
+    return await this.workoutRepository.deleteAll();
   }
 }

@@ -17,6 +17,9 @@ export class Exercise {
   @Column('text', { array: true })
   instructions: string[];
 
-  @ManyToOne(() => Plan, (plan) => plan.exercises, { onDelete: 'CASCADE' })
-  day: Plan;
+  @ManyToOne(() => Plan, (plan) => plan.exercises, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  plan: Plan;
 }

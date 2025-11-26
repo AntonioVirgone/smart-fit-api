@@ -12,8 +12,6 @@ async function bootstrap() {
     .setTitle('SmartFit API')
     .setDescription('API per gestione utenti, attivazioni, schede e storico')
     .setVersion('1.0')
-    .addTag('users')
-    .addTag('schede')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

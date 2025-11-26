@@ -6,10 +6,8 @@ import {
   Param,
   Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
-import { UpdatePlanDto } from './dto/update-plan.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreatePlanByExerciseCode } from './dto/create-plan-by-excercise-code.dto';
 import { AddExerciseDto } from './dto/add-exercise.dto';
@@ -19,9 +17,9 @@ export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create plan' })
-  async day(@Body() createDayDto: CreatePlanByExerciseCode) {
-    return await this.planService.createDayByExCode(createDayDto);
+  @ApiOperation({ summary: 'Create plan with exercises' })
+  async create(@Body() createPlanByExerciseCode: CreatePlanByExerciseCode) {
+    return await this.planService.createPlanByExCode(createPlanByExerciseCode);
   }
 
   @Patch(':planCode/exercise')
@@ -51,18 +49,9 @@ export class PlanController {
     return this.planService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.planService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
-    return this.planService.update(+id, updatePlanDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.planService.remove(+id);
+  @Delete()
+  @ApiOperation({ summary: 'Delete all plans' })
+  async removeAllPlan() {
+    return await this.planService.removeAll();
   }
 }

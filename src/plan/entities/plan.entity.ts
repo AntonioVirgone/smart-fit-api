@@ -16,11 +16,13 @@ export class Plan {
   @Column()
   name: string;
 
-  @ManyToOne(() => Workout, (workout) => workout.days, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Workout, (workout) => workout.plans, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   workout: Workout;
 
-  @OneToMany(() => Exercise, (exercise) => exercise.day, {
-    cascade: true,
+  @OneToMany(() => Exercise, (exercise) => exercise.plan, {
     eager: true,
   })
   exercises: Exercise[];
