@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
@@ -14,6 +14,7 @@ import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateDayByExerciseCode } from './dto/create-day-by-excercise-code.dto';
 
 @ApiTags('workout')
 @Controller('workout')
@@ -23,7 +24,13 @@ export class WorkoutController {
   @Post('exercise')
   @ApiOperation({ summary: 'Create exercise' })
   async createPlane(@Body() createExercise: CreateExerciseDto) {
-    return this.workoutService.createExercise(createExercise);
+    return await this.workoutService.createExercise(createExercise);
+  }
+
+  @Post('day')
+  @ApiOperation({ summary: 'Create day' })
+  async day(@Body() createDayDto: CreateDayByExerciseCode) {
+    return await this.workoutService.createDayByExCode(createDayDto);
   }
 
   @UseGuards(JwtAuthGuard)

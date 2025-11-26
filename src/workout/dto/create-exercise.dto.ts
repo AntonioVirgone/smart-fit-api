@@ -1,6 +1,5 @@
 import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column } from 'typeorm';
 
 export class CreateExerciseDto {
   @IsNotEmpty()
