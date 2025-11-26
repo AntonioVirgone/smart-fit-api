@@ -4,6 +4,7 @@ import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Exercise } from '../workout/entities/exercise.entity';
 import { In, Repository } from 'typeorm';
+import { raw } from 'express';
 
 @Injectable()
 export class ExerciseService {
@@ -47,8 +48,8 @@ export class ExerciseService {
     return await this.exerciseRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateExerciseDto: UpdateExerciseDto) {
-    return `This action updates a #${id} exercise`;
+  async update(id: string, updateExerciseDto: UpdateExerciseDto) {
+    return await this.exerciseRepository.update(id, updateExerciseDto);
   }
 
   remove(id: number) {

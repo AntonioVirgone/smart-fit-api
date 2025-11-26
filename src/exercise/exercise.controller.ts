@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { UpdateExerciseDto } from './dto/update-exercise.dto';
 
 @Controller('exercise')
 export class ExerciseController {
@@ -23,6 +32,15 @@ export class ExerciseController {
   @ApiOperation({ summary: 'Find exercise by id' })
   async find(@Param('exerciseId') exerciseId: string) {
     return await this.exerciseService.findOne(exerciseId);
+  }
+
+  @Patch(':exerciseId')
+  @ApiOperation({ summary: 'Update exercise' })
+  async patch(
+    @Param('exerciseId') exerciseId: string,
+    @Body() updateExerciseDto: UpdateExerciseDto,
+  ) {
+    return await this.exerciseService.update(exerciseId, updateExerciseDto);
   }
 
   @Delete()
