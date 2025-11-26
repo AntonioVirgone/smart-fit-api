@@ -7,16 +7,24 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
 import { CreateWorkoutDto } from './dto/create-workout.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('workout')
 @Controller('workout')
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
+
+  @Post('exercise')
+  @ApiOperation({ summary: 'Create exercise' })
+  async createPlane(@Body() createExercise: CreateExerciseDto) {
+    return this.workoutService.createExercise(createExercise);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post(':customerId/user')

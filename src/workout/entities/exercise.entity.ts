@@ -10,8 +10,11 @@ export class Exercise {
   @Column() description: string;
   @Column() imageName: string;
   @Column() muscleGroup: string;
+  @Column({ type: 'int', default: 0 }) sets: number;
+  @Column({ type: 'int', default: 0 }) repetitions: number;
+  @Column({ type: 'int', default: 0 }) recovery: number;
 
-  @Column("text", { array: true })
+  @Column('text', { array: true })
   instructions: string[];
 
   @ManyToOne(() => Day, (day) => day.exercises, { onDelete: 'CASCADE' })
