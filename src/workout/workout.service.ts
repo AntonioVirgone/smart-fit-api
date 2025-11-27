@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Workout } from './entities/workout.entity';
 import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
 import { Plan } from '../plan/entities/plan.entity';
+import { AddPlanDto } from './dto/add-plan.dto';
+import { AddExerciseDto } from '../plan/dto/add-exercise.dto';
 
 @Injectable()
 export class WorkoutService {
@@ -72,11 +74,63 @@ export class WorkoutService {
     return await this.workoutRepository.save(workout);
   }
 
+  async findOne(id: string) {
+    return await this.workoutRepository.findOne({ where: { id } });
+  }
+
   async findAll() {
     return await this.workoutRepository.find();
   }
 
   async removeAll() {
     return await this.workoutRepository.deleteAll();
+  }
+
+  async addPlanToWorkout(workoutCode: string, addPlanDto: AddPlanDto) {
+    const workout = await this.findOne(workoutCode);
+    if (!workout) {
+      throw new NotFoundException(`Workout with code ${workoutCode} not found`);
+    }
+
+    // Trova tutti gli esercizi in un'unica query
+    const plans = await this.planRepository.findBy({
+      id: In(addPlanDto.plans),
+    });
+
+    if (!plans.length) {
+      throw new NotFoundException(`No exercises found with the provided IDs`);
+    }
+
+    // Aggiungi solo gli esercizi che non sono già presenti
+    const newPlans = plans.filter(
+      (ex) => !workout.plans.some((e) => e.id === ex.id),
+    );
+    workout.plans.push(...newPlans);
+
+    await this.planRepository.save(workout); // salva le modifiche
+
+    return workout; // opzionale, per restituire il piano aggiornato
+  }
+
+  async removePlanFromWorkout(workoutCode: string, planCode: string) {
+    const workout = await this.findOne(workoutCode);
+    if (!workout) {
+      throw new NotFoundException(`Plan with code ${workoutCode} not found`);
+    }
+
+    const planIndex = workout.plans.findIndex((e) => e.id === planCode);
+    if (planIndex === -1) {
+      throw new NotFoundException(
+        `Exercise with id ${planCode} not found in this plan`,
+      );
+    }
+
+    // Rimuovi l'esercizio dall'array
+    workout.plans.splice(planIndex, 1);
+
+    // Salva le modifiche
+    await this.planRepository.save(workout);
+
+    return workout; // opzionale: restituisce il piano aggiornato
   }
 }
