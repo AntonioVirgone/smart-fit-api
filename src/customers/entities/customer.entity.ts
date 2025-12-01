@@ -8,11 +8,11 @@ import {
 
 @Entity('customer')
 export class Customer {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 255 })
-  code: string;
+  trainerCode: string;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;

@@ -9,7 +9,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 export class CustomersService {
   constructor(
     @InjectRepository(Customer)
-    private readonly customRepo: Repository<Customer>,
+    private readonly customerRepository: Repository<Customer>,
   ) {}
 
   // ➤ Genera codice di attivazione (tipo ABC123)
@@ -23,27 +23,30 @@ export class CustomersService {
   }
 
   // ➤ Il trainer crea un nuovo utente
-  async createCustomer(dto: CreateCustomerDto) {
+  async createCustomer(trainerCode: string, dto: CreateCustomerDto) {
     const activationCode = this.generateActivationCode();
+    const activationToken = this.generateActivationToken();
 
-    const user = this.customRepo.create({
+    const customer = this.customerRepository.create({
+      trainerCode: trainerCode,
       name: dto.name,
-      activationCode,
+      activationCode: activationCode,
+      activationToken: activationToken,
       status: 'pending',
     });
 
-    await this.customRepo.save(user);
+    await this.customerRepository.save(customer);
 
     return {
-      customerId: user.id,
+      customerCode: customer.id,
       activationCode,
     };
   }
 
   // ➤ L’utente inserisce il codice e attiva l’account
   async activate(dto: ActivateUserDto) {
-    const user = await this.customRepo.findOne({
-      where: { activationCode: dto.activationCode },
+    const user = await this.customerRepository.findOne({
+      where: { id: dto.customerCode, activationCode: dto.activationCode },
     });
 
     if (!user) {
@@ -56,15 +59,27 @@ export class CustomersService {
     user.activationCode = null;
     user.status = 'active';
 
-    await this.customRepo.save(user);
+    await this.customerRepository.save(user);
 
     return { activationToken: token };
   }
 
+  async isActive(code: string) {
+    return await this.customerRepository.findOne({
+      where: { id: code, status: 'active' },
+    });
+  }
+
   // ➤ Per guard custom (trova utente tramite token)
   async findByToken(token: string): Promise<Customer | null> {
-    return this.customRepo.findOne({
+    return await this.customerRepository.findOne({
       where: { activationToken: token },
+    });
+  }
+
+  async findByTrainerCode(trainerCode: string) {
+    return await this.customerRepository.find({
+      where: { trainerCode: trainerCode },
     });
   }
 }
