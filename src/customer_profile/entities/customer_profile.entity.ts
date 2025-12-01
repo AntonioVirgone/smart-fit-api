@@ -26,10 +26,10 @@ export class CustomerProfile {
   @Column({ type: 'varchar', length: 255 })
   phone: string;
 
-  @Column({ type: 'integer', length: 3 })
+  @Column({ type: 'int' })
   age: number;
 
-  @Column({ type: 'integer', length: 3 })
+  @Column({ type: 'int' })
   weight: number;
 
   @Column({ type: 'decimal', precision: 3, scale: 2 })
