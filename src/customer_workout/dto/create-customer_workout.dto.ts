@@ -3,8 +3,8 @@ import { IsUUID } from 'class-validator';
 
 export class CreateCustomerWorkoutDto {
   @IsUUID()
-  customerId: string;
+  customerCode: string;
 
   @IsUUID()
-  workoutId: string;
+  workoutCode: string;
 }

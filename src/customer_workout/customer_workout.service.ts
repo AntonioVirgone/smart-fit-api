@@ -20,12 +20,12 @@ export class CustomerWorkoutService {
 
   async assign(dto: CreateCustomerWorkoutDto) {
     const customer = await this.customerRepo.findOne({
-      where: { id: dto.customerId },
+      where: { id: dto.customerCode },
     });
     if (!customer) throw new NotFoundException('Customer not found');
 
     const workout = await this.workoutRepo.findOne({
-      where: { id: dto.workoutId },
+      where: { id: dto.workoutCode },
     });
     if (!workout) throw new NotFoundException('Workout not found');
 

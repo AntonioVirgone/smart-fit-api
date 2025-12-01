@@ -3,7 +3,7 @@ import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Customer } from '../../customers/entities/customer.entity';
 import { Workout } from '../../workout/entities/workout.entity';
 
-@Entity()
+@Entity('customer_workout')
 export class CustomerWorkout {
   @PrimaryGeneratedColumn('uuid')
   id: string;

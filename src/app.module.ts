@@ -11,6 +11,7 @@ import { CustomersModule } from './customers/customers.module';
 import { ExerciseModule } from './exercise/exercise.module';
 import { PlanModule } from './plan/plan.module';
 import { CustomerWorkoutModule } from './customer_workout/customer_workout.module';
+import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CustomerWorkoutModule } from './customer_workout/customer_workout.modul
     ExerciseModule,
     PlanModule,
     CustomerWorkoutModule,
+    CustomerProfileModule,
   ],
 })
 export class AppModule {}
