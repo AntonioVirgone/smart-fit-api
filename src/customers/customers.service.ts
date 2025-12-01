@@ -38,7 +38,8 @@ export class CustomersService {
     await this.customerRepository.save(customer);
 
     return {
-      customerCode: customer.id,
+      id: customer.id,
+      name: customer.name,
       activationCode,
     };
   }
