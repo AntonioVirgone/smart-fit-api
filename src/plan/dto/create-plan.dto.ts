@@ -1,14 +1,8 @@
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator';
-import { CreateExerciseDto } from './create-exercise.dto';
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { CreateExerciseDto } from '../../exercise/dto/create-exercise.dto';
 
-export class CreateDayDto {
+export class CreatePlanDto {
   @IsNotEmpty()
   @IsString()
   name: string;

@@ -6,6 +6,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkoutModule } from './workout/workout.module';
+import { MailModule } from './mail/mail.module';
+import { CustomersModule } from './customers/customers.module';
+import { ExerciseModule } from './exercise/exercise.module';
+import { PlanModule } from './plan/plan.module';
+import { CustomerWorkoutModule } from './customer_workout/customer_workout.module';
+import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 
 @Module({
   imports: [
@@ -39,6 +45,12 @@ import { WorkoutModule } from './workout/workout.module';
     UsersModule,
     AuthModule,
     WorkoutModule,
+    MailModule,
+    CustomersModule,
+    ExerciseModule,
+    PlanModule,
+    CustomerWorkoutModule,
+    CustomerProfileModule,
   ],
 })
 export class AppModule {}

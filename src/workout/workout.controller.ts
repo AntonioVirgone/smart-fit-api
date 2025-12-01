@@ -1,26 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Req,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
-import { CreateWorkoutDto } from './dto/create-workout.dto';
-import { UpdateWorkoutDto } from './dto/update-workout.dto';
-import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
+import { AddExerciseDto } from '../plan/dto/add-exercise.dto';
+import { AddPlanDto } from './dto/add-plan.dto';
 
+@ApiTags('Workout')
 @Controller('workout')
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
+  /*
   @UseGuards(JwtAuthGuard)
   @Post(':customerId/user')
-  async create(
+  async assign(
     @Param('customerId') customerId: string,
     @Body() createWorkoutDto: CreateWorkoutDto,
   ) {
@@ -32,24 +33,45 @@ export class WorkoutController {
   async find(@Param('customerId') customerId: string) {
     return await this.workoutService.findByCustomerId(customerId);
   }
+  */
+
+  @Post()
+  @ApiOperation({ summary: 'Save workout with plans' })
+  async create(@Body() createWorkoutByPlanCode: CreateWorkoutByPlanCodeDto) {
+    return await this.workoutService.createWorkoutByPlanCode(
+      createWorkoutByPlanCode,
+    );
+  }
 
   @Get()
   findAll() {
     return this.workoutService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workoutService.findOne(+id);
+  @Patch(':workoutCode/plan')
+  @ApiOperation({ summary: 'Add plan to workout' })
+  async addPlan(
+    @Param('workoutCode') workoutCode: string,
+    @Body() addPlanDto: AddPlanDto,
+  ) {
+    return await this.workoutService.addPlanToWorkout(workoutCode, addPlanDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWorkoutDto: UpdateWorkoutDto) {
-    return this.workoutService.update(+id, updateWorkoutDto);
+  @Patch(':workoutCode/plan/:planCode')
+  @ApiOperation({ summary: 'Remove plan from workout' })
+  async removeExercise(
+    @Param('workoutCode') workoutCode: string,
+    @Param('planCode') planCode: string,
+  ) {
+    return await this.workoutService.removePlanFromWorkout(
+      workoutCode,
+      planCode,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.workoutService.remove(+id);
+  @Delete()
+  @ApiOperation({ summary: 'Delete all workouts' })
+  async delete() {
+    return await this.workoutService.removeAll();
   }
 }
