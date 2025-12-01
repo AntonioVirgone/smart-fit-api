@@ -8,7 +8,7 @@ import {
 
 @Entity('customer_profile')
 export class CustomerProfile {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 255 })
@@ -32,7 +32,7 @@ export class CustomerProfile {
   @Column({ type: 'int' })
   weight: number;
 
-  @Column({ type: 'decimal', precision: 3, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   height: number;
 
   @CreateDateColumn()

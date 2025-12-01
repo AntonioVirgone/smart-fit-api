@@ -1,15 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CustomerProfileService } from './customer_profile.service';
 import { CreateCustomerProfileDto } from './dto/create-customer_profile.dto';
 import { UpdateCustomerProfileDto } from './dto/update-customer_profile.dto';
 
 @Controller('customer-profile')
 export class CustomerProfileController {
-  constructor(private readonly customerProfileService: CustomerProfileService) {}
+  constructor(
+    private readonly customerProfileService: CustomerProfileService,
+  ) {}
 
-  @Post()
-  create(@Body() createCustomerProfileDto: CreateCustomerProfileDto) {
-    return this.customerProfileService.create(createCustomerProfileDto);
+  @Post(':customerCode')
+  create(
+    @Param('customerCode') customerCode: string,
+    @Body() createCustomerProfileDto: CreateCustomerProfileDto,
+  ) {
+    return this.customerProfileService.create(
+      customerCode,
+      createCustomerProfileDto,
+    );
   }
 
   @Get()
@@ -23,7 +39,10 @@ export class CustomerProfileController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCustomerProfileDto: UpdateCustomerProfileDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCustomerProfileDto: UpdateCustomerProfileDto,
+  ) {
     return this.customerProfileService.update(+id, updateCustomerProfileDto);
   }
 

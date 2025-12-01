@@ -21,7 +21,7 @@ export class CustomerWorkoutController {
   }
 
   @Get('customer/:customerId')
-  @ApiOperation({ summary: 'Assign customer to workout' })
+  @ApiOperation({ summary: 'Find workout associated to customer' })
   findByCustomer(@Param('customerId') customerId: string) {
     return this.service.findByCustomer(customerId);
   }
