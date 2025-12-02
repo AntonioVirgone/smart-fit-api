@@ -1,18 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { MailService } from '../mail/mail.service';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
+import crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly prisma: PrismaService,
     private readonly mailService: MailService,
   ) {}
 
@@ -22,15 +21,15 @@ export class UsersService {
     const codeValidator = crypto.randomUUID();
     console.log(codeValidator); // '398de222-5bf9-4754-8e3e-011a55307014'
 
-    const newUser = this.userRepository.create({
-      customerId: uuidv4(),
-      username: createUserDto.username,
-      password: hashedPassword,
-      email: createUserDto.email,
-      codeValidator: codeValidator,
+    const user = await this.prisma.user.create({
+      data: {
+        customerId: uuidv4(),
+        username: createUserDto.username,
+        password: hashedPassword,
+        email: createUserDto.email,
+        codeValidator: codeValidator,
+      },
     });
-
-    const user = await this.userRepository.save(newUser);
 
     if (!user) {
       throw new BadRequestException('User not created');
@@ -44,13 +43,13 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.userRepository.find({
-      order: { created_at: 'DESC' },
+    return await this.prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async findUserByCredential(username: string) {
-    const user = await this.userRepository.findOne({ where: { username } });
+    const user = await this.prisma.user.findUnique({ where: { username } });
 
     console.log(user);
     if (!user) {
@@ -61,30 +60,30 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.prisma.user.findUnique({ where: { id } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.prisma.user.update({ where: { id }, data: updateUserDto });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.prisma.user.delete({ where: { id } });
   }
 
   async removeAll() {
-    return this.userRepository.deleteAll();
+    return this.prisma.user.deleteMany();
   }
 
   async updateRefreshToken(id: number, refreshToken: string | null) {
-    await this.userRepository.update(id, { refreshToken });
+    await this.prisma.user.update({ where: { id }, data: { refreshToken } });
   }
 
   async findByUsername(username: string) {
-    return this.userRepository.findOne({ where: { username } });
+    return this.prisma.user.findUnique({ where: { username } });
   }
 
   async findById(id: number) {
-    return this.userRepository.findOne({ where: { id } });
+    return this.prisma.user.findUnique({ where: { id } });
   }
 }

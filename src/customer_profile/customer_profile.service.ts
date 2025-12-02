@@ -1,16 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerProfileDto } from './dto/create-customer_profile.dto';
 import { UpdateCustomerProfileDto } from './dto/update-customer_profile.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CustomerProfile } from './entities/customer_profile.entity';
 import { CustomersService } from '../customers/customers.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CustomerProfileService {
   constructor(
-    @InjectRepository(CustomerProfile)
-    private readonly customerProfileRepository: Repository<CustomerProfile>,
+    private readonly prisma: PrismaService,
     private readonly customerService: CustomersService,
   ) {}
 
@@ -24,33 +21,36 @@ export class CustomerProfileService {
       throw new NotFoundException('Utente non attivo');
     }
 
-    const customerProfile = this.customerProfileRepository.create({
-      customerCode: customerCode,
-      name: createCustomerProfileDto.name,
-      lastname: createCustomerProfileDto.lastname,
-      email: createCustomerProfileDto.email,
-      phone: createCustomerProfileDto.phone,
-      age: createCustomerProfileDto.age,
-      weight: createCustomerProfileDto.weight,
-      height: createCustomerProfileDto.height,
+    return this.prisma.customerProfile.create({
+      data: {
+        customerCode: customerCode,
+        name: createCustomerProfileDto.name,
+        lastname: createCustomerProfileDto.lastname,
+        email: createCustomerProfileDto.email,
+        phone: createCustomerProfileDto.phone,
+        age: createCustomerProfileDto.age,
+        weight: createCustomerProfileDto.weight,
+        height: createCustomerProfileDto.height,
+      },
     });
-
-    await this.customerProfileRepository.save(customerProfile);
   }
 
   findAll() {
-    return `This action returns all customerProfile`;
+    return this.prisma.customerProfile.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customerProfile`;
+  findOne(id: string) {
+    return this.prisma.customerProfile.findUnique({ where: { id } });
   }
 
-  update(id: number, updateCustomerProfileDto: UpdateCustomerProfileDto) {
-    return `This action updates a #${id} customerProfile`;
+  update(id: string, updateCustomerProfileDto: UpdateCustomerProfileDto) {
+    return this.prisma.customerProfile.update({
+      where: { id },
+      data: updateCustomerProfileDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customerProfile`;
+  remove(id: string) {
+    return this.prisma.customerProfile.delete({ where: { id } });
   }
 }

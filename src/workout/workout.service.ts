@@ -1,19 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { Workout } from './entities/workout.entity';
 import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
-import { Plan } from '../plan/entities/plan.entity';
 import { AddPlanDto } from './dto/add-plan.dto';
-import { AddExerciseDto } from '../plan/dto/add-exercise.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Plan, Workout } from '@prisma/client';
 
 @Injectable()
 export class WorkoutService {
   constructor(
-    @InjectRepository(Workout)
-    private workoutRepository: Repository<Workout>,
-    @InjectRepository(Plan)
-    private planRepository: Repository<Plan>,
+    private readonly prisma: PrismaService,
   ) {}
 
   /*
@@ -56,65 +50,87 @@ export class WorkoutService {
   async createWorkoutByPlanCode(
     createWorkoutByPlanCode: CreateWorkoutByPlanCodeDto,
   ) {
-    const plans: Plan[] = [];
-
-    for (const id of createWorkoutByPlanCode.plans) {
-      const plan = await this.planRepository.findOne({ where: { id } });
-      if (!plan) {
-        throw new NotFoundException(`Exercise with id ${id} not found`);
-      }
-      plans.push(plan);
-    }
-
-    // Creiamo il giorno
-    const workout = this.workoutRepository.create({
-      name: createWorkoutByPlanCode.name,
-      plans: plans,
+    const plans = await this.prisma.plan.findMany({
+      where: { id: { in: createWorkoutByPlanCode.plans } },
     });
 
-    return await this.workoutRepository.save(workout);
+    const missingPlans = createWorkoutByPlanCode.plans.filter(
+      (id) => !plans.some((plan) => plan.id === id),
+    );
+
+    if (missingPlans.length) {
+      throw new NotFoundException(`Plan with id ${missingPlans.join(', ')} not found`);
+    }
+
+    return await this.prisma.workout.create({
+      data: {
+        name: createWorkoutByPlanCode.name,
+        plans: {
+          connect: plans.map((plan) => ({ id: plan.id })),
+        },
+      },
+      include: { plans: { include: { exercises: true } } },
+    });
   }
 
   async findOne(id: string) {
-    return await this.workoutRepository.findOne({ where: { id } });
+    return await this.prisma.workout.findUnique({
+      where: { id },
+      include: { plans: { include: { exercises: true } } },
+    });
   }
 
   async findAll() {
-    return await this.workoutRepository.find();
+    return await this.prisma.workout.findMany({
+      include: { plans: { include: { exercises: true } } },
+    });
   }
 
   async removeAll() {
-    return await this.workoutRepository.deleteAll();
+    return await this.prisma.workout.deleteMany();
   }
 
   async addPlanToWorkout(workoutCode: string, addPlanDto: AddPlanDto) {
-    const workout = await this.findOne(workoutCode);
+    const workout = await this.prisma.workout.findUnique({
+      where: { id: workoutCode },
+      include: { plans: true },
+    });
     if (!workout) {
       throw new NotFoundException(`Workout with code ${workoutCode} not found`);
     }
 
-    // Trova tutti gli esercizi in un'unica query
-    const plans = await this.planRepository.findBy({
-      id: In(addPlanDto.plans),
+    const plans = await this.prisma.plan.findMany({
+      where: { id: { in: addPlanDto.plans } },
     });
 
     if (!plans.length) {
       throw new NotFoundException(`No exercises found with the provided IDs`);
     }
 
-    // Aggiungi solo gli esercizi che non sono già presenti
     const newPlans = plans.filter(
       (ex) => !workout.plans.some((e) => e.id === ex.id),
     );
-    workout.plans.push(...newPlans);
 
-    await this.planRepository.save(workout); // salva le modifiche
+    if (!newPlans.length) {
+      return workout;
+    }
 
-    return workout; // opzionale, per restituire il piano aggiornato
+    return this.prisma.workout.update({
+      where: { id: workoutCode },
+      data: {
+        plans: {
+          connect: newPlans.map((plan) => ({ id: plan.id })),
+        },
+      },
+      include: { plans: { include: { exercises: true } } },
+    });
   }
 
   async removePlanFromWorkout(workoutCode: string, planCode: string) {
-    const workout = await this.findOne(workoutCode);
+    const workout = await this.prisma.workout.findUnique({
+      where: { id: workoutCode },
+      include: { plans: true },
+    });
     if (!workout) {
       throw new NotFoundException(`Plan with code ${workoutCode} not found`);
     }
@@ -126,12 +142,16 @@ export class WorkoutService {
       );
     }
 
-    // Rimuovi l'esercizio dall'array
-    workout.plans.splice(planIndex, 1);
+    const remainingPlans = workout.plans.filter((plan) => plan.id !== planCode);
 
-    // Salva le modifiche
-    await this.planRepository.save(workout);
-
-    return workout; // opzionale: restituisce il piano aggiornato
+    return this.prisma.workout.update({
+      where: { id: workoutCode },
+      data: {
+        plans: {
+          set: remainingPlans.map((plan) => ({ id: plan.id })),
+        },
+      },
+      include: { plans: { include: { exercises: true } } },
+    });
   }
 }

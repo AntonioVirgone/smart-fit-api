@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { History } from './entities/history.entity';
+import { History } from '@prisma/client';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { SaveJsonDto } from './dto/save-json.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class HistoryService {
   constructor(
-    @InjectRepository(History)
-    private readonly historyRepository: Repository<History>,
+    private readonly prisma: PrismaService,
   ) {}
 
   async saveJson(
@@ -29,29 +27,28 @@ export class HistoryService {
 
     console.log(stringaUnita);
 
-    const history = this.historyRepository.create(createHistoryDto);
-    return await this.historyRepository.save(history);
+    return await this.prisma.history.create({ data: createHistoryDto });
   }
 
   async findAll(): Promise<History[]> {
-    return await this.historyRepository.find({
-      order: { created_at: 'DESC' },
+    return await this.prisma.history.findMany({
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async findByCustomerId(customerId: string): Promise<History[]> {
-    return await this.historyRepository.find({ where: { customerId } });
+    return await this.prisma.history.findMany({ where: { customerId } });
   }
 
   async findById(id: number): Promise<History | null> {
-    return await this.historyRepository.findOne({ where: { id } });
+    return await this.prisma.history.findUnique({ where: { id } });
   }
 
   async delete(id: number): Promise<void> {
-    await this.historyRepository.delete(id);
+    await this.prisma.history.delete({ where: { id } });
   }
 
   async deleteAll(): Promise<void> {
-    await this.historyRepository.deleteAll();
+    await this.prisma.history.deleteMany();
   }
 }
