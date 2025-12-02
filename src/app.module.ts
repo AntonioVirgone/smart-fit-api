@@ -12,6 +12,7 @@ import { PlanModule } from './plan/plan.module';
 import { CustomerWorkoutModule } from './customer_workout/customer_workout.module';
 import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { TrainerModule } from './trainer/trainer.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PlanModule,
     CustomerWorkoutModule,
     CustomerProfileModule,
+    TrainerModule,
   ],
 })
 export class AppModule {}

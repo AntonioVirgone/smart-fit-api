@@ -7,9 +7,7 @@ import crypto from 'crypto';
 
 @Injectable()
 export class CustomersService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // ➤ Genera codice di attivazione (tipo ABC123)
   private generateActivationCode(): string {
@@ -28,7 +26,7 @@ export class CustomersService {
 
     const customer = await this.prisma.customer.create({
       data: {
-        trainerCode,
+        trainerId: trainerCode,
         name: dto.name,
         activationCode,
         activationToken,
@@ -82,7 +80,7 @@ export class CustomersService {
 
   async findByTrainerCode(trainerCode: string) {
     return await this.prisma.customer.findMany({
-      where: { trainerCode: trainerCode },
+      where: { trainerId: trainerCode },
     });
   }
 }
