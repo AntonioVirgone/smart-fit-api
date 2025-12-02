@@ -8,12 +8,12 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   // ➤ Il trainer crea un nuovo utente
-  @Post(':trainerCode')
+  @Post(':trainerId')
   async create(
-    @Param('trainerCode') trainerCode: string,
+    @Param('trainerId') trainerId: string,
     @Body() dto: CreateCustomerDto,
   ) {
-    return await this.customersService.createCustomer(trainerCode, dto);
+    return await this.customersService.createCustomer(trainerId, dto);
   }
 
   // ➤ L’utente attiva il proprio profilo
@@ -22,8 +22,8 @@ export class CustomersController {
     return this.customersService.activate(dto);
   }
 
-  @Get(':trainerCode')
-  async get(@Param('trainerCode') trainerCode: string) {
-    return await this.customersService.findByTrainerCode(trainerCode);
+  @Get(':trainerId')
+  async get(@Param('trainerId') trainerId: string) {
+    return await this.customersService.findByTrainerId(trainerId);
   }
 }
