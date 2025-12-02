@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ActivateUserDto } from './dto/activate-user.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { Customer } from '@prisma/client';
 import crypto from 'crypto';
 
 @Injectable()
@@ -20,16 +19,14 @@ export class CustomersService {
   }
 
   // ➤ Il trainer crea un nuovo utente
-  async createCustomer(trainerCode: string, dto: CreateCustomerDto) {
+  async createCustomer(trainerId: string, dto: CreateCustomerDto) {
     const activationCode = this.generateActivationCode();
-    const activationToken = this.generateActivationToken();
 
     const customer = await this.prisma.customer.create({
       data: {
-        trainerId: trainerCode,
+        trainerId: trainerId,
         name: dto.name,
         activationCode,
-        activationToken,
         status: 'pending',
       },
     });
@@ -51,36 +48,23 @@ export class CustomersService {
       throw new NotFoundException('Codice di attivazione non valido');
     }
 
-    const token = this.generateActivationToken();
-
-    await this.prisma.customer.update({
+    return this.prisma.customer.update({
       where: { id: user.id },
       data: {
-        activationToken: token,
-        activationCode: null,
         status: 'active',
       },
     });
-
-    return { activationToken: token };
   }
 
   async isActive(code: string) {
-    return await this.prisma.customer.findFirst({
+    return this.prisma.customer.findFirst({
       where: { id: code, status: 'active' },
     });
   }
 
-  // ➤ Per guard custom (trova utente tramite token)
-  async findByToken(token: string): Promise<Customer | null> {
-    return await this.prisma.customer.findFirst({
-      where: { activationToken: token },
-    });
-  }
-
-  async findByTrainerCode(trainerCode: string) {
-    return await this.prisma.customer.findMany({
-      where: { trainerId: trainerCode },
+  async findByTrainerId(trainerId: string) {
+    return this.prisma.customer.findMany({
+      where: { trainerId: trainerId },
     });
   }
 }

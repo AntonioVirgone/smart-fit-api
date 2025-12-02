@@ -60,16 +60,15 @@ model Exercise {
 }
 
 model Customer {
-  id              String            @id @default(uuid())
-  name            String
-  activationCode  String?
-  activationToken String?
-  status          String            @default("pending")
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  workouts        CustomerWorkout[]
-  Trainer         Trainer?          @relation(fields: [trainerId], references: [id])
-  trainerId       String?
+  id             String            @id @default(uuid())
+  name           String
+  activationCode String?
+  status         String            @default("pending")
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  workouts       CustomerWorkout[]
+  Trainer        Trainer?          @relation(fields: [trainerId], references: [id])
+  trainerId      String?
 }
 
 model CustomerProfile {
