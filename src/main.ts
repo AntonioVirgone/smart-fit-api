@@ -40,6 +40,8 @@ async function bootstrap() {
   // Imposta il prefisso globale per le API
   app.setGlobalPrefix('api');
 
+  app.enableShutdownHooks(); // <— ora si fa qui
+
   // Usa la porta fornita da Render o default 3000
   const port = process.env.PORT || 3000;
 
