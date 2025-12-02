@@ -16,10 +16,13 @@ import { UpdateExerciseDto } from './dto/update-exercise.dto';
 export class ExerciseController {
   constructor(private readonly exerciseService: ExerciseService) {}
 
-  @Post()
+  @Post(':trainerCode')
   @ApiOperation({ summary: 'Create exercise' })
-  async createPlane(@Body() createExercise: CreateExerciseDto) {
-    return await this.exerciseService.createExercise(createExercise);
+  async createPlane(
+    @Param('trainerCode') trainerCode: string,
+    @Body() createExercise: CreateExerciseDto,
+  ) {
+    return await this.exerciseService.createExercise(trainerCode, createExercise);
   }
 
   @Get()

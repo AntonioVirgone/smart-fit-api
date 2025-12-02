@@ -6,6 +6,8 @@ export class Exercise {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  trainerCode: string;
   @Column() name: string;
   @Column() description: string;
   @Column() imageName: string;

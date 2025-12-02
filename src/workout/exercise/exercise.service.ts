@@ -12,8 +12,9 @@ export class ExerciseService {
     private exerciseRepository: Repository<Exercise>,
   ) {}
 
-  async createExercise(ex: CreateExerciseDto) {
+  async createExercise(trainerCode: string, ex: CreateExerciseDto) {
     const exercise = this.exerciseRepository.create({
+      trainerCode: trainerCode,
       name: ex.name,
       description: ex.description,
       imageName: ex.imageName,

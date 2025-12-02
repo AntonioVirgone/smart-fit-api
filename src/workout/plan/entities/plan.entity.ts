@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Workout } from '../../workout/entities/workout.entity';
+import { Workout } from '../../workouts/entities/workout.entity';
 import { Exercise } from '../../exercise/entities/exercise.entity';
 
 @Entity()

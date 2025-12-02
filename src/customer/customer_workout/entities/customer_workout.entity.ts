@@ -1,7 +1,7 @@
 // customer_workout.entity.ts
 import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Customer } from '../../customers/entities/customer.entity';
-import { Workout } from '../../workout/entities/workout.entity';
+import { Workout } from '../../../workout/workouts/entities/workout.entity';
 
 @Entity('customer_workout')
 export class CustomerWorkout {

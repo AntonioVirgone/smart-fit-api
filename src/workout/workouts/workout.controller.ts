@@ -10,7 +10,6 @@ import {
 import { WorkoutService } from './workout.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
-import { AddExerciseDto } from '../plan/dto/add-exercise.dto';
 import { AddPlanDto } from './dto/add-plan.dto';
 
 @ApiTags('Workout')
@@ -70,7 +69,7 @@ export class WorkoutController {
   }
 
   @Delete()
-  @ApiOperation({ summary: 'Delete all workouts' })
+  @ApiOperation({ summary: 'Delete all workout' })
   async delete() {
     return await this.workoutService.removeAll();
   }

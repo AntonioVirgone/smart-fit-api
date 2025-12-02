@@ -5,7 +5,6 @@ import { Workout } from './entities/workout.entity';
 import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
 import { Plan } from '../plan/entities/plan.entity';
 import { AddPlanDto } from './dto/add-plan.dto';
-import { AddExerciseDto } from '../plan/dto/add-exercise.dto';
 
 @Injectable()
 export class WorkoutService {
@@ -86,6 +85,7 @@ export class WorkoutService {
     return await this.workoutRepository.deleteAll();
   }
 
+  // ---- ADD PLAN TO WORKOUT ----
   async addPlanToWorkout(workoutCode: string, addPlanDto: AddPlanDto) {
     const workout = await this.findOne(workoutCode);
     if (!workout) {
@@ -112,6 +112,7 @@ export class WorkoutService {
     return workout; // opzionale, per restituire il piano aggiornato
   }
 
+  // ---- REMOVE ----
   async removePlanFromWorkout(workoutCode: string, planCode: string) {
     const workout = await this.findOne(workoutCode);
     if (!workout) {

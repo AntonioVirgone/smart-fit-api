@@ -4,7 +4,7 @@ import { CustomerWorkoutService } from './customer_workout.service';
 import { CreateCustomerWorkoutDto } from './dto/create-customer_workout.dto';
 import { ApiOperation } from '@nestjs/swagger';
 
-@Controller('customer-workouts')
+@Controller('customer-workout')
 export class CustomerWorkoutController {
   constructor(private readonly service: CustomerWorkoutService) {}
 
