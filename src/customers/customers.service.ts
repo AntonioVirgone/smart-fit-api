@@ -1,15 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ActivateUserDto } from './dto/activate-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from './entities/customer.entity';
-import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Customer } from '@prisma/client';
+import crypto from 'crypto';
 
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectRepository(Customer)
-    private readonly customerRepository: Repository<Customer>,
+    private readonly prisma: PrismaService,
   ) {}
 
   // ➤ Genera codice di attivazione (tipo ABC123)
@@ -27,15 +26,15 @@ export class CustomersService {
     const activationCode = this.generateActivationCode();
     const activationToken = this.generateActivationToken();
 
-    const customer = this.customerRepository.create({
-      trainerCode: trainerCode,
-      name: dto.name,
-      activationCode: activationCode,
-      activationToken: activationToken,
-      status: 'pending',
+    const customer = await this.prisma.customer.create({
+      data: {
+        trainerCode,
+        name: dto.name,
+        activationCode,
+        activationToken,
+        status: 'pending',
+      },
     });
-
-    await this.customerRepository.save(customer);
 
     return {
       id: customer.id,
@@ -46,7 +45,7 @@ export class CustomersService {
 
   // ➤ L’utente inserisce il codice e attiva l’account
   async activate(dto: ActivateUserDto) {
-    const user = await this.customerRepository.findOne({
+    const user = await this.prisma.customer.findFirst({
       where: { id: dto.customerCode, activationCode: dto.activationCode },
     });
 
@@ -56,30 +55,33 @@ export class CustomersService {
 
     const token = this.generateActivationToken();
 
-    user.activationToken = token;
-    user.activationCode = null;
-    user.status = 'active';
-
-    await this.customerRepository.save(user);
+    await this.prisma.customer.update({
+      where: { id: user.id },
+      data: {
+        activationToken: token,
+        activationCode: null,
+        status: 'active',
+      },
+    });
 
     return { activationToken: token };
   }
 
   async isActive(code: string) {
-    return await this.customerRepository.findOne({
+    return await this.prisma.customer.findFirst({
       where: { id: code, status: 'active' },
     });
   }
 
   // ➤ Per guard custom (trova utente tramite token)
   async findByToken(token: string): Promise<Customer | null> {
-    return await this.customerRepository.findOne({
+    return await this.prisma.customer.findFirst({
       where: { activationToken: token },
     });
   }
 
   async findByTrainerCode(trainerCode: string) {
-    return await this.customerRepository.find({
+    return await this.prisma.customer.findMany({
       where: { trainerCode: trainerCode },
     });
   }

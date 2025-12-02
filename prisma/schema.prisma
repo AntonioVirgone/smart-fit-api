@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  customerId    String   @default("xxx")
+  username      String   @unique
+  password      String
+  email         String   @unique
+  type          String   @default("CONSUMER")
+  refreshToken  String?
+  codeValidator String?
+  status        String   @default("INACTIVE")
+  createdAt     DateTime @default(now())
+}
+
+model History {
+  id        Int      @id @default(autoincrement())
+  customerId String
+  jsonData  Json?
+  filename  String?
+  dataSize  Int      @default(0)
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
+
+model Workout {
+  id     String  @id @default(uuid())
+  name   String?
+  plans  Plan[]
+  owners CustomerWorkout[]
+}
+
+model Plan {
+  id        String    @id @default(uuid())
+  name      String
+  workout   Workout?  @relation(fields: [workoutId], references: [id], onDelete: SetNull)
+  workoutId String?
+  exercises Exercise[]
+}
+
+model Exercise {
+  id           String   @id @default(uuid())
+  name         String
+  description  String
+  imageName    String
+  muscleGroup  String
+  sets         Int      @default(0)
+  repetitions  Int      @default(0)
+  recovery     Int      @default(0)
+  instructions String[]
+  plan         Plan?    @relation(fields: [planId], references: [id], onDelete: SetNull)
+  planId       String?
+}
+
+model Customer {
+  id              String             @id @default(uuid())
+  trainerCode     String
+  name            String
+  activationCode  String?
+  activationToken String?
+  status          String             @default("pending")
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  workouts        CustomerWorkout[]
+}
+
+model CustomerProfile {
+  id           String   @id @default(uuid())
+  customerCode String
+  name         String
+  lastname     String
+  email        String
+  phone        String
+  age          Int
+  weight       Int
+  height       Decimal @db.Decimal(5, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CustomerWorkout {
+  id         String   @id @default(uuid())
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  workout    Workout  @relation(fields: [workoutId], references: [id])
+  workoutId  String
+}

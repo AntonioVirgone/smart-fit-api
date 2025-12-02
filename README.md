@@ -31,6 +31,14 @@
 $ npm install
 ```
 
+## Database (Prisma)
+
+The application now uses Prisma instead of TypeORM. Set a `DATABASE_URL` environment variable pointing to your PostgreSQL instance (e.g. `postgresql://user:password@localhost:5432/dbname`) and generate the Prisma client before running the app:
+
+```bash
+$ npx prisma generate
+```
+
 ## Compile and run the project
 
 ```bash
