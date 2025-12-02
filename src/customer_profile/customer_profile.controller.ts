@@ -35,7 +35,7 @@ export class CustomerProfileController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.customerProfileService.findOne(+id);
+    return this.customerProfileService.findOne(id);
   }
 
   @Patch(':id')
@@ -43,11 +43,11 @@ export class CustomerProfileController {
     @Param('id') id: string,
     @Body() updateCustomerProfileDto: UpdateCustomerProfileDto,
   ) {
-    return this.customerProfileService.update(+id, updateCustomerProfileDto);
+    return this.customerProfileService.update(id, updateCustomerProfileDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.customerProfileService.remove(+id);
+    return this.customerProfileService.remove(id);
   }
 }
