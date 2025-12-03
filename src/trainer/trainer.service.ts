@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
+import { LoginTrainerDto } from './dto/login-trainer.dto';
 
 @Injectable()
 export class TrainerService {
@@ -23,6 +24,15 @@ export class TrainerService {
     return this.prisma.trainer.findFirst({
       where: { id },
       include: { customers: true },
+    });
+  }
+
+  findOneByUsernameAndPassword(loginTrainerDto: LoginTrainerDto) {
+    return this.prisma.trainer.findFirst({
+      where: {
+        name: loginTrainerDto.name,
+        password: loginTrainerDto.password,
+      },
     });
   }
 

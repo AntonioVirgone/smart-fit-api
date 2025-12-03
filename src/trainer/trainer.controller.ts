@@ -10,6 +10,7 @@ import {
 import { TrainerService } from './trainer.service';
 import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
+import { LoginTrainerDto } from './dto/login-trainer.dto';
 
 @Controller('trainer')
 export class TrainerController {
@@ -28,6 +29,11 @@ export class TrainerController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.trainerService.findOne(id);
+  }
+
+  @Post('login')
+  login(@Body() dto: LoginTrainerDto) {
+    return this.trainerService.findOneByUsernameAndPassword(dto);
   }
 
   @Patch(':id')
