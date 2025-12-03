@@ -13,6 +13,7 @@ import { CustomerWorkoutModule } from './customer_workout/customer_workout.modul
 import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TrainerModule } from './trainer/trainer.module';
+import { HealthModule } from './health.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TrainerModule } from './trainer/trainer.module';
       inject: [ConfigService],
     }),
     PrismaModule,
+    HealthModule,
     HistoryModule,
     UsersModule,
     AuthModule,
