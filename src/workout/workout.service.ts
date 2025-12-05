@@ -6,9 +6,7 @@ import { Plan, Workout } from '@prisma/client';
 
 @Injectable()
 export class WorkoutService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /*
   async create(customerId: string, dto: CreateWorkoutDto): Promise<Workout> {
@@ -59,7 +57,9 @@ export class WorkoutService {
     );
 
     if (missingPlans.length) {
-      throw new NotFoundException(`Plan with id ${missingPlans.join(', ')} not found`);
+      throw new NotFoundException(
+        `Plan with id ${missingPlans.join(', ')} not found`,
+      );
     }
 
     return await this.prisma.workout.create({

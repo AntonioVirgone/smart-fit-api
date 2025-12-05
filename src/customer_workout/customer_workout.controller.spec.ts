@@ -11,7 +11,9 @@ describe('CustomerWorkoutController', () => {
       providers: [CustomerWorkoutService],
     }).compile();
 
-    controller = module.get<CustomerWorkoutController>(CustomerWorkoutController);
+    controller = module.get<CustomerWorkoutController>(
+      CustomerWorkoutController,
+    );
   });
 
   it('should be defined', () => {
