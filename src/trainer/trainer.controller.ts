@@ -32,8 +32,8 @@ export class TrainerController {
   }
 
   @Post('login')
-  login(@Body() dto: LoginTrainerDto) {
-    return this.trainerService.findOneByUsernameAndPassword(dto);
+  async login(@Body() dto: LoginTrainerDto) {
+    return await this.trainerService.findOneByUsernameAndPassword(dto);
   }
 
   @Patch(':id')

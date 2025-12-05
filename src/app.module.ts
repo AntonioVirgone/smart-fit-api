@@ -14,6 +14,7 @@ import { CustomerProfileModule } from './customer_profile/customer_profile.modul
 import { PrismaModule } from './prisma/prisma.module';
 import { TrainerModule } from './trainer/trainer.module';
 import { HealthModule } from './health.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HealthModule } from './health.module';
     AuthModule,
     WorkoutModule,
     MailModule,
+    NotificationsModule,
     CustomersModule,
     ExerciseModule,
     PlanModule,
