@@ -6,9 +6,7 @@ import { Exercise, Plan } from '@prisma/client';
 
 @Injectable()
 export class PlanService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createPlanByExCode(createPlanByExerciseCode: CreatePlanByExerciseCode) {
     const exercises = await this.prisma.exercise.findMany({

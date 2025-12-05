@@ -27,13 +27,16 @@ export class TrainerService {
     });
   }
 
-  findOneByUsernameAndPassword(loginTrainerDto: LoginTrainerDto) {
-    return this.prisma.trainer.findFirst({
+  async findOneByUsernameAndPassword(loginTrainerDto: LoginTrainerDto) {
+    const trainer = this.prisma.trainer.findFirst({
       where: {
         name: loginTrainerDto.name,
         password: loginTrainerDto.password,
       },
     });
+
+    console.log(trainer);
+    return trainer;
   }
 
   update(id: string, updateTrainerDto: UpdateTrainerDto) {
