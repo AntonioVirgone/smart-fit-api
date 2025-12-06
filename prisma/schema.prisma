@@ -62,6 +62,9 @@ model Exercise {
 model Customer {
   id             String            @id @default(uuid())
   name           String
+  email          String?
+  phone          String?
+  password       String?
   activationCode String?
   status         String            @default("pending")
   createdAt      DateTime          @default(now())
@@ -77,8 +80,6 @@ model CustomerProfile {
   customerCode String
   name         String
   lastname     String
-  email        String
-  phone        String
   age          Int
   weight       Int
   height       Decimal  @db.Decimal(5, 2)

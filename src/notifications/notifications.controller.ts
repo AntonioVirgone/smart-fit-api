@@ -11,7 +11,6 @@ export class NotificationsController {
     @Param('customerId') customerId: string,
     @Body() dto: RegisterDeviceTokenDto,
   ) {
-    console.log('api register request');
     return this.notifications.registerDeviceToken(customerId, dto);
   }
 
