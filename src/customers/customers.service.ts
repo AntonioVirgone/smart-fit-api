@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ActivateUserDto } from './dto/activate-user.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ActivateCustomerDto } from './dto/activate-customer.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import crypto from 'crypto';
+import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Injectable()
 export class CustomersService {
@@ -13,19 +17,19 @@ export class CustomersService {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
   }
 
-  // ➤ Genera activation token definitivo (UUID)
-  private generateActivationToken(): string {
-    return crypto.randomUUID();
-  }
-
   // ➤ Il trainer crea un nuovo utente
   async createCustomer(trainerId: string, dto: CreateCustomerDto) {
+    if ((await this.findByEmail(dto.email)).length > 0) {
+      throw new BadRequestException('Email already exists');
+    }
     const activationCode = this.generateActivationCode();
 
     const customer = await this.prisma.customer.create({
       data: {
         trainerId: trainerId,
         name: dto.name,
+        email: dto.email,
+        phone: dto.phoneNumber,
         activationCode,
         status: 'pending',
       },
@@ -34,14 +38,16 @@ export class CustomersService {
     return {
       id: customer.id,
       name: customer.name,
+      email: customer.email,
+      phoneNumber: customer.phone,
       activationCode,
     };
   }
 
   // ➤ L’utente inserisce il codice e attiva l’account
-  async activate(dto: ActivateUserDto) {
+  async activate(dto: ActivateCustomerDto) {
     const user = await this.prisma.customer.findFirst({
-      where: { id: dto.customerCode, activationCode: dto.activationCode },
+      where: { email: dto.email, activationCode: dto.activationCode },
     });
 
     if (!user) {
@@ -62,9 +68,30 @@ export class CustomersService {
     });
   }
 
-  async findByTrainerId(trainerId: string) {
+  findByTrainerId(trainerId: string) {
     return this.prisma.customer.findMany({
       where: { trainerId: trainerId },
     });
+  }
+
+  async findByEmail(email: string) {
+    return this.prisma.customer.findMany({
+      where: { email: email },
+    });
+  }
+
+  async findOneByUsernameAndPassword(loginCustomerDto: LoginCustomerDto) {
+    console.log('findOneByUsernameAndPassword called');
+    const customer = await this.prisma.customer.findFirst({
+      where: {
+        email: loginCustomerDto.email,
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Codice di attivazione non valido');
+    }
+
+    return customer;
   }
 }

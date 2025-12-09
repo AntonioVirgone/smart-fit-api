@@ -26,8 +26,6 @@ export class CustomerProfileService {
         customerCode: customerCode,
         name: createCustomerProfileDto.name,
         lastname: createCustomerProfileDto.lastname,
-        email: createCustomerProfileDto.email,
-        phone: createCustomerProfileDto.phone,
         age: createCustomerProfileDto.age,
         weight: createCustomerProfileDto.weight,
         height: createCustomerProfileDto.height,
