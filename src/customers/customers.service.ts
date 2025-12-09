@@ -6,7 +6,6 @@ import {
 import { ActivateCustomerDto } from './dto/activate-customer.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import crypto from 'crypto';
 import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Injectable()
@@ -18,14 +17,9 @@ export class CustomersService {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
   }
 
-  // ➤ Genera activation token definitivo (UUID)
-  private generateActivationToken(): string {
-    return crypto.randomUUID();
-  }
-
   // ➤ Il trainer crea un nuovo utente
   async createCustomer(trainerId: string, dto: CreateCustomerDto) {
-    if ((await this.findByEmail(dto.email)) != null) {
+    if ((await this.findByEmail(dto.email)).length > 0) {
       throw new BadRequestException('Email already exists');
     }
     const activationCode = this.generateActivationCode();
