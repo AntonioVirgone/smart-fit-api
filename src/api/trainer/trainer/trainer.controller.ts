@@ -11,6 +11,7 @@ import { TrainerService } from './trainer.service';
 import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { LoginTrainerDto } from './dto/login-trainer.dto';
+import { CreateCustomerDto } from '../../customer/customers/dto/create-customer.dto';
 
 @Controller('trainer')
 export class TrainerController {
@@ -44,5 +45,15 @@ export class TrainerController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.trainerService.remove(id);
+  }
+
+  // ➤ Il trainer crea un nuovo utente
+  @Post(':trainerId/customers')
+  async createCustomer(
+    @Param('trainerId') trainerId: string,
+    @Body() dto: CreateCustomerDto,
+  ) {
+    console.log('create');
+    return await this.trainerService.createCustomer(trainerId, dto);
   }
 }

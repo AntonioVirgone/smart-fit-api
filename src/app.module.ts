@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
-import { HistoryModule } from './history/history.module';
+import { HistoryModule } from './api/customer/history/history.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { WorkoutModule } from './workout/workout.module';
+import { WorkoutModule } from './api/trainer/workout/workout.module';
 import { MailModule } from './mail/mail.module';
-import { CustomersModule } from './customers/customers.module';
-import { ExerciseModule } from './exercise/exercise.module';
-import { PlanModule } from './plan/plan.module';
-import { CustomerWorkoutModule } from './customer_workout/customer_workout.module';
-import { CustomerProfileModule } from './customer_profile/customer_profile.module';
+import { CustomersModule } from './api/customer/customers/customers.module';
+import { ExerciseModule } from './api/trainer/exercise/exercise.module';
+import { PlanModule } from './api/trainer/plan/plan.module';
+import { CustomerWorkoutModule } from './api/customer/customer_workout/customer_workout.module';
+import { CustomerProfileModule } from './api/customer/customer_profile/customer_profile.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { TrainerModule } from './trainer/trainer.module';
+import { TrainerModule } from './api/trainer/trainer/trainer.module';
 import { HealthModule } from './health.module';
 import { NotificationsModule } from './notifications/notifications.module';
 

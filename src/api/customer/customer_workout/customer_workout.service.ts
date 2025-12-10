@@ -1,7 +1,7 @@
 // customer_workout.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerWorkoutDto } from './dto/create-customer_workout.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class CustomerWorkoutService {

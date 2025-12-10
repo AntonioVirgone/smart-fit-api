@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkoutByPlanCodeDto } from './dto/create-workout-by-plan-code.dto';
 import { AddPlanDto } from './dto/add-plan.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { Plan, Workout } from '@prisma/client';
 
 @Injectable()

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerProfileDto } from './dto/create-customer_profile.dto';
 import { UpdateCustomerProfileDto } from './dto/update-customer_profile.dto';
 import { CustomersService } from '../customers/customers.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class CustomerProfileService {
@@ -26,8 +26,6 @@ export class CustomerProfileService {
         customerCode: customerCode,
         name: createCustomerProfileDto.name,
         lastname: createCustomerProfileDto.lastname,
-        email: createCustomerProfileDto.email,
-        phone: createCustomerProfileDto.phone,
         age: createCustomerProfileDto.age,
         weight: createCustomerProfileDto.weight,
         height: createCustomerProfileDto.height,

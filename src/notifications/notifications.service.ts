@@ -12,14 +12,7 @@ export class NotificationsService {
 
   /** Salva o aggiorna un token */
   async registerDeviceToken(customerId: string, dto: RegisterDeviceTokenDto) {
-    const customer = await this.prisma.customer.findUnique({
-      where: { id: customerId },
-    });
-
-    if (!customer) {
-      console.log('Customer not found');
-      throw new NotFoundException('Customer not found');
-    }
+    await this.customerVerify(customerId);
 
     const existing = await this.prisma.deviceToken.findUnique({
       where: { token: dto.token },
@@ -49,6 +42,7 @@ export class NotificationsService {
     customerId: string,
     workoutName: string,
   ) {
+    await this.customerVerify(customerId);
     const tokens = await this.prisma.deviceToken.findMany({
       where: { customerId },
     });
@@ -64,6 +58,18 @@ export class NotificationsService {
         );
       }
       // FUTURO: android -> FCM
+    }
+  }
+
+  private async customerVerify(customerId: string) {
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId, status: 'active' },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    } else if (customer.status !== 'active') {
+      throw new NotFoundException('Customer not active');
     }
   }
 }

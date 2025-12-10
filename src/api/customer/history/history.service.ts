@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { History } from '@prisma/client';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { SaveJsonDto } from './dto/save-json.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class HistoryService {
