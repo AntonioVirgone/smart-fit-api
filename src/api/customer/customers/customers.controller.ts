@@ -1,22 +1,12 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { ActivateCustomerDto } from './dto/activate-customer.dto';
-import { CreateCustomerDto } from './dto/create-customer.dto';
 import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-  // ➤ Il trainer crea un nuovo utente
-  @Post(':trainerId/create')
-  async create(
-    @Param('trainerId') trainerId: string,
-    @Body() dto: CreateCustomerDto,
-  ) {
-    console.log('create');
-    return await this.customersService.createCustomer(trainerId, dto);
-  }
 
   // ➤ L’utente attiva il proprio profilo
   @Patch('activate')

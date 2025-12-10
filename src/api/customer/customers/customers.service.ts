@@ -1,48 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ActivateCustomerDto } from './dto/activate-customer.dto';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Injectable()
 export class CustomersService {
   constructor(private readonly prisma: PrismaService) {}
-
-  // ➤ Genera codice di attivazione (tipo ABC123)
-  private generateActivationCode(): string {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
-  }
-
-  // ➤ Il trainer crea un nuovo utente
-  async createCustomer(trainerId: string, dto: CreateCustomerDto) {
-    if ((await this.findByEmail(dto.email)).length > 0) {
-      throw new BadRequestException('Email already exists');
-    }
-    const activationCode = this.generateActivationCode();
-
-    const customer = await this.prisma.customer.create({
-      data: {
-        trainerId: trainerId,
-        name: dto.name,
-        email: dto.email,
-        phone: dto.phoneNumber,
-        activationCode,
-        status: 'pending',
-      },
-    });
-
-    return {
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
-      phoneNumber: customer.phone,
-      activationCode,
-    };
-  }
 
   // ➤ L’utente inserisce il codice e attiva l’account
   async activate(dto: ActivateCustomerDto) {
@@ -71,12 +34,6 @@ export class CustomersService {
   findByTrainerId(trainerId: string) {
     return this.prisma.customer.findMany({
       where: { trainerId: trainerId },
-    });
-  }
-
-  async findByEmail(email: string) {
-    return this.prisma.customer.findMany({
-      where: { email: email },
     });
   }
 

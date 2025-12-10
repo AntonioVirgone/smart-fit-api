@@ -14,7 +14,7 @@ import {
 import { HistoryService } from './history.service';
 import { SaveJsonDto } from './dto/save-json.dto';
 import { History } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../auth/guard/jwt-auth.guard';
 
 @Controller('history')
 export class HistoryController {
