@@ -7,8 +7,6 @@ import { LoginCustomerDto } from './dto/login-customer.dto';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-
-  // ➤ L’utente attiva il proprio profilo
   @Patch('activate')
   activate(@Body() dto: ActivateCustomerDto) {
     console.log('activate');

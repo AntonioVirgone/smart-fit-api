@@ -4,10 +4,14 @@ import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { LoginTrainerDto } from './dto/login-trainer.dto';
 import { CreateCustomerDto } from '../../customer/customers/dto/create-customer.dto';
+import { CustomersService } from '../../customer/customers/customers.service';
 
 @Injectable()
 export class TrainerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly customerService: CustomersService,
+  ) {}
 
   create(createTrainerDto: CreateTrainerDto) {
     return this.prisma.trainer.create({
@@ -83,5 +87,17 @@ export class TrainerService {
       phoneNumber: customer.phone,
       activationCode,
     };
+  }
+
+  async disableCustomer(trainerId: string, customerId: string) {
+    const customerClient = await this.prisma.customer.findFirst({
+      where: { id: customerId, trainerId: trainerId },
+    });
+
+    if (!customerClient) {
+      throw new BadRequestException('Action not permitted');
+    }
+
+    return await this.customerService.updateStatus(customerId, 'disable');
   }
 }

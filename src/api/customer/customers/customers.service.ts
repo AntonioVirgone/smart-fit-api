@@ -25,6 +25,22 @@ export class CustomersService {
     });
   }
 
+  async updateStatus(id: string, status: string) {
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: id },
+    });
+    if (!customer) {
+      throw new NotFoundException('Customer not exists');
+    }
+
+    return this.prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        status: status,
+      },
+    });
+  }
+
   async isActive(code: string) {
     return this.prisma.customer.findFirst({
       where: { id: code, status: 'active' },
