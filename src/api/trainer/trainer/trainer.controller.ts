@@ -66,4 +66,18 @@ export class TrainerController {
     console.log('disable');
     return await this.trainerService.disableCustomer(trainerId, customerId);
   }
+
+  @Patch(':trainerId/customer/:customerId/regenerate-code')
+  async generateCode(
+    @Param('trainerId') trainerId: string,
+    @Param('customerId') customerId: string,
+  ) {
+    console.log('generateCode');
+    return await this.trainerService.generateCode(trainerId, customerId);
+  }
+
+  @Get(':trainerId/customers')
+  async get(@Param('trainerId') trainerId: string) {
+    return this.trainerService.findAllCustomerByTrainerId(trainerId);
+  }
 }

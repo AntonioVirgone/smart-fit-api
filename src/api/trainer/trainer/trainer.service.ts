@@ -5,6 +5,7 @@ import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { LoginTrainerDto } from './dto/login-trainer.dto';
 import { CreateCustomerDto } from '../../customer/customers/dto/create-customer.dto';
 import { CustomersService } from '../../customer/customers/customers.service';
+import { CustomerStatus } from '../../customer/customers/customer-status.enum';
 
 @Injectable()
 export class TrainerService {
@@ -76,7 +77,7 @@ export class TrainerService {
         email: dto.email,
         phone: dto.phoneNumber,
         activationCode,
-        status: 'pending',
+        status: CustomerStatus.Pending,
       },
     });
 
@@ -89,7 +90,7 @@ export class TrainerService {
     };
   }
 
-  async disableCustomer(trainerId: string, customerId: string) {
+  async findCustomerById(trainerId: string, customerId: string) {
     const customerClient = await this.prisma.customer.findFirst({
       where: { id: customerId, trainerId: trainerId },
     });
@@ -97,7 +98,33 @@ export class TrainerService {
     if (!customerClient) {
       throw new BadRequestException('Action not permitted');
     }
+    return customerClient;
+  }
 
-    return await this.customerService.updateStatus(customerId, 'disable');
+  async disableCustomer(trainerId: string, customerId: string) {
+    await this.findCustomerById(trainerId, customerId);
+    return await this.customerService.updateStatus(
+      customerId,
+      CustomerStatus.Disabled,
+    );
+  }
+
+  async generateCode(trainerId: string, customerId: string) {
+    await this.findCustomerById(trainerId, customerId);
+    const activationCode = this.generateActivationCode();
+    return this.prisma.customer.update({
+      where: { id: customerId },
+      data: {
+        activationCode: activationCode,
+        status: CustomerStatus.Pending,
+      },
+    });
+  }
+
+  async findAllCustomerByTrainerId(trainerId: string) {
+    return this.prisma.customer.findMany({
+      where: { trainerId: trainerId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }
