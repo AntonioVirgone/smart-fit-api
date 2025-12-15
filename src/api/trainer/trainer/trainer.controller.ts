@@ -39,6 +39,7 @@ export class TrainerController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateTrainerDto) {
+    console.log('update', id);
     return this.trainerService.update(id, dto);
   }
 
@@ -55,5 +56,28 @@ export class TrainerController {
   ) {
     console.log('create');
     return await this.trainerService.createCustomer(trainerId, dto);
+  }
+
+  @Patch(':trainerId/customer/:customerId')
+  async disableCustomer(
+    @Param('trainerId') trainerId: string,
+    @Param('customerId') customerId: string,
+  ) {
+    console.log('disable');
+    return await this.trainerService.disableCustomer(trainerId, customerId);
+  }
+
+  @Patch(':trainerId/customer/:customerId/regenerate-code')
+  async generateCode(
+    @Param('trainerId') trainerId: string,
+    @Param('customerId') customerId: string,
+  ) {
+    console.log('generateCode');
+    return await this.trainerService.generateCode(trainerId, customerId);
+  }
+
+  @Get(':trainerId/customers')
+  async get(@Param('trainerId') trainerId: string) {
+    return this.trainerService.findAllCustomerByTrainerId(trainerId);
   }
 }

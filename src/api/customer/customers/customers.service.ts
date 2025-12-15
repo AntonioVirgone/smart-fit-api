@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ActivateCustomerDto } from './dto/activate-customer.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { LoginCustomerDto } from './dto/login-customer.dto';
+import { CustomerStatus } from './customer-status.enum';
 
 @Injectable()
 export class CustomersService {
@@ -20,23 +21,33 @@ export class CustomersService {
     return this.prisma.customer.update({
       where: { id: user.id },
       data: {
-        status: 'active',
+        status: CustomerStatus.Active,
+      },
+    });
+  }
+
+  async updateStatus(id: string, status: CustomerStatus) {
+    const customer = await this.prisma.customer.findFirst({
+      where: { id: id },
+    });
+    if (!customer) {
+      throw new NotFoundException('Customer not exists');
+    }
+
+    return this.prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        status: status,
       },
     });
   }
 
   async isActive(code: string) {
     return this.prisma.customer.findFirst({
-      where: { id: code, status: 'active' },
+      where: { id: code, status: CustomerStatus.Active },
     });
   }
-
-  findByTrainerId(trainerId: string) {
-    return this.prisma.customer.findMany({
-      where: { trainerId: trainerId },
-    });
-  }
-
+  
   async findOneByUsernameAndPassword(loginCustomerDto: LoginCustomerDto) {
     console.log('findOneByUsernameAndPassword called');
     const customer = await this.prisma.customer.findFirst({

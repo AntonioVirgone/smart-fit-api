@@ -15,6 +15,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TrainerModule } from './api/trainer/trainer/trainer.module';
 import { HealthModule } from './health.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { HistoryWorkoutModule } from './api/customer/history_workout/history_workout.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     CustomerWorkoutModule,
     CustomerProfileModule,
     TrainerModule,
+    HistoryWorkoutModule,
   ],
 })
 export class AppModule {}
