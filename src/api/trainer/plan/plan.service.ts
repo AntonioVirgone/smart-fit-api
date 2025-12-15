@@ -8,113 +8,111 @@ import { Exercise, Plan } from '@prisma/client';
 export class PlanService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createPlanByExCode(createPlanByExerciseCode: CreatePlanByExerciseCode) {
+  async createPlanByExCode(dto: CreatePlanByExerciseCode) {
+    // verifica esercizi
     const exercises = await this.prisma.exercise.findMany({
-      where: { id: { in: createPlanByExerciseCode.exercises } },
+      where: { id: { in: dto.exercises } },
+      select: { id: true },
     });
 
-    const missingExercises = createPlanByExerciseCode.exercises.filter(
-      (id) => !exercises.some((exercise) => exercise.id === id),
-    );
+    const foundIds = exercises.map((e) => e.id);
+    const missing = dto.exercises.filter((id) => !foundIds.includes(id));
 
-    if (missingExercises.length) {
+    if (missing.length) {
       throw new NotFoundException(
-        `Exercise with id ${missingExercises.join(', ')} not found`,
+        `Exercise with id ${missing.join(', ')} not found`,
       );
     }
 
-    return await this.prisma.plan.create({
-      data: {
-        name: createPlanByExerciseCode.name,
-        exercises: {
-          connect: exercises.map((exercise) => ({ id: exercise.id })),
-        },
-      },
-      include: { exercises: true },
+    // crea plan
+    const plan = await this.prisma.plan.create({
+      data: { name: dto.name },
     });
+
+    // collega esercizi (join table)
+    await this.prisma.planExercise.createMany({
+      data: dto.exercises.map((exerciseId, index) => ({
+        planId: plan.id,
+        exerciseId,
+        order: index,
+      })),
+    });
+
+    return this.findById(plan.id);
   }
 
-  async addExerciseToPlan(planCode: string, addExerciseDto: AddExerciseDto) {
-    const plan = await this.prisma.plan.findUnique({
-      where: { id: planCode },
-      include: { exercises: true },
-    });
-    if (!plan) {
-      throw new NotFoundException(`Plan with code ${planCode} not found`);
-    }
-
-    const exercises = await this.prisma.exercise.findMany({
-      where: { id: { in: addExerciseDto.exercises } },
+  async addExerciseToPlan(planId: string, dto: AddExerciseDto) {
+    const planExists = await this.prisma.plan.findUnique({
+      where: { id: planId },
+      select: { id: true },
     });
 
-    if (!exercises.length) {
-      throw new NotFoundException(`No exercises found with the provided IDs`);
+    if (!planExists) {
+      throw new NotFoundException(`Plan ${planId} not found`);
     }
 
-    const newExercises = exercises.filter(
-      (ex) => !plan.exercises.some((e) => e.id === ex.id),
-    );
-
-    if (!newExercises.length) {
-      return plan;
-    }
-
-    return this.prisma.plan.update({
-      where: { id: planCode },
-      data: {
-        exercises: {
-          connect: newExercises.map((exercise) => ({ id: exercise.id })),
-        },
-      },
-      include: { exercises: true },
+    await this.prisma.planExercise.createMany({
+      data: dto.exercises.map((exerciseId, index) => ({
+        planId,
+        exerciseId,
+        order: index,
+      })),
+      skipDuplicates: true,
     });
+
+    return this.findById(planId);
   }
 
-  async removeExerciseFromPlan(planCode: string, exerciseId: string) {
-    const plan = await this.prisma.plan.findUnique({
-      where: { id: planCode },
-      include: { exercises: true },
+  async removeExerciseFromPlan(planId: string, exerciseId: string) {
+    const deleted = await this.prisma.planExercise.deleteMany({
+      where: {
+        planId,
+        exerciseId,
+      },
     });
-    if (!plan) {
-      throw new NotFoundException(`Plan with code ${planCode} not found`);
-    }
 
-    const exerciseIndex = plan.exercises.findIndex((e) => e.id === exerciseId);
-    if (exerciseIndex === -1) {
+    if (deleted.count === 0) {
       throw new NotFoundException(
-        `Exercise with id ${exerciseId} not found in this plan`,
+        `Exercise ${exerciseId} not associated with plan ${planId}`,
       );
     }
 
-    const remainingExercises = plan.exercises.filter(
-      (exercise) => exercise.id !== exerciseId,
-    );
-
-    return this.prisma.plan.update({
-      where: { id: planCode },
-      data: {
-        exercises: {
-          set: remainingExercises.map((exercise) => ({ id: exercise.id })),
-        },
-      },
-      include: { exercises: true },
-    });
+    return this.findById(planId);
   }
 
   async findAll() {
-    return await this.prisma.plan.findMany({
-      include: { exercises: true, workout: true },
+    return this.prisma.plan.findMany({
+      include: {
+        planExercises: {
+          orderBy: { order: 'asc' },
+          include: {
+            exercise: true,
+          },
+        },
+        workoutPlans: {
+          include: {
+            workout: true,
+          },
+        },
+      },
     });
   }
 
-  async findOne(id: string) {
-    return await this.prisma.plan.findUnique({
-      where: { id },
-      include: { exercises: true, workout: true },
+  async findById(planId: string) {
+    return this.prisma.plan.findUnique({
+      where: { id: planId },
+      include: {
+        planExercises: {
+          orderBy: { order: 'asc' },
+          include: {
+            exercise: true,
+          },
+        },
+      },
     });
   }
 
   async removeAll() {
-    return await this.prisma.plan.deleteMany();
+    return this.prisma.plan.deleteMany();
   }
 }

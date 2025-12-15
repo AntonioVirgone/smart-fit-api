@@ -10,24 +10,57 @@ export class CustomerWorkoutService {
   async assign(dto: CreateCustomerWorkoutDto) {
     const customer = await this.prisma.customer.findUnique({
       where: { id: dto.customerCode },
+      select: { id: true, status: true },
     });
-    if (!customer) throw new NotFoundException('Customer not found');
 
-    if (customer.status !== 'active')
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    if (customer.status !== 'active') {
       throw new NotFoundException('Customer not active');
+    }
 
     const workout = await this.prisma.workout.findUnique({
       where: { id: dto.workoutCode },
+      select: { id: true },
     });
-    if (!workout) throw new NotFoundException('Workout not found');
 
-    return this.prisma.customerWorkout.create({
+    if (!workout) {
+      throw new NotFoundException('Workout not found');
+    }
+
+    // assegna workout al customer
+    const customerWorkout = await this.prisma.customerWorkout.create({
       data: {
-        customer: { connect: { id: dto.customerCode } },
-        workout: { connect: { id: dto.workoutCode } },
+        customerId: dto.customerCode,
+        workoutId: dto.workoutCode,
       },
+    });
+
+    // restituisci workout completo
+    return this.prisma.customerWorkout.findUnique({
+      where: { id: customerWorkout.id },
       include: {
-        workout: { include: { plans: { include: { exercises: true } } } },
+        workout: {
+          include: {
+            workoutPlans: {
+              orderBy: { order: 'asc' },
+              include: {
+                plan: {
+                  include: {
+                    planExercises: {
+                      orderBy: { order: 'asc' },
+                      include: {
+                        exercise: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -46,7 +79,25 @@ export class CustomerWorkoutService {
     return this.prisma.customerWorkout.findMany({
       where: { customerId },
       include: {
-        workout: { include: { plans: { include: { exercises: true } } } },
+        workout: {
+          include: {
+            workoutPlans: {
+              orderBy: { order: 'asc' },
+              include: {
+                plan: {
+                  include: {
+                    planExercises: {
+                      orderBy: { order: 'asc' },
+                      include: {
+                        exercise: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
