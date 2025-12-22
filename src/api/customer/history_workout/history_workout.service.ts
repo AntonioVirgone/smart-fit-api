@@ -46,4 +46,8 @@ export class HistoryWorkoutService {
   remove(id: number) {
     return `This action removes a #${id} historyWorkout`;
   }
+
+  find() {
+    return this.prisma.historyWorkout.findMany({});
+  }
 }
