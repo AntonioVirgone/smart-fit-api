@@ -33,16 +33,20 @@ model History {
 model Workout {
   id     String            @id @default(uuid())
   name   String?
-  plans  Plan[]
   owners CustomerWorkout[]
+
+  workoutPlans WorkoutPlan[]
+  Plan         Plan[]
 }
 
 model Plan {
-  id        String     @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  workout   Workout?   @relation(fields: [workoutId], references: [id], onDelete: SetNull)
+  workout   Workout? @relation(fields: [workoutId], references: [id], onDelete: SetNull)
   workoutId String?
-  exercises Exercise[]
+
+  workoutPlans  WorkoutPlan[]
+  planExercises PlanExercise[]
 }
 
 model Exercise {
@@ -55,8 +59,50 @@ model Exercise {
   repetitions  Int      @default(0)
   recovery     Int      @default(0)
   instructions String[]
-  plan         Plan?    @relation(fields: [planId], references: [id], onDelete: SetNull)
-  planId       String?
+
+  planExercises PlanExercise[]
+}
+
+model WorkoutPlan {
+  id        String  @id @default(uuid())
+  workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workoutId String
+
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId String
+
+  order     Int? // opzionale: ordine dei plan nel workout
+  createdAt DateTime @default(now())
+
+  @@unique([workoutId, planId])
+}
+
+model PlanExercise {
+  id     String @id @default(uuid())
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId String
+
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId String
+
+  order Int?
+
+  createdAt DateTime @default(now())
+
+  @@unique([planId, exerciseId])
+}
+
+model HistoryWorkout {
+  id          String   @id @default(uuid())
+  customerId  String
+  exerciseId  String
+  repetitions Int
+  weight      Decimal  @db.Decimal(5, 2)
+  notes       String
+  type        String   @default("series")
+  intensity   String   @default("light")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Customer {
@@ -66,7 +112,7 @@ model Customer {
   phone          String?
   password       String?
   activationCode String?
-  status         String            @default("pending")
+  status         CustomerStatus    @default(pending)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   workouts       CustomerWorkout[]
@@ -115,4 +161,21 @@ model DeviceToken {
   customerId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+enum CustomerStatus {
+  pending
+  active
+  disabled
+}
+
+enum WorkoutType {
+  heating
+  series
+}
+
+enum WorkoutIntensity {
+  light
+  moderate
+  intense
 }

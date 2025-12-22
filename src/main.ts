@@ -29,13 +29,9 @@ async function bootstrap() {
 
   // Abilita CORS per le richieste frontend
   app.enableCors({
-    origin: [
-      'https://your-frontend-domain.onrender.com', // Sostituisci con il tuo dominio Render
-      'http://localhost:3000',
-      'http://localhost:3001',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    credentials: true,
+    origin: '*',
+    methods: '*',
+    allowedHeaders: '*',
   });
 
   // Imposta il prefisso globale per le API
