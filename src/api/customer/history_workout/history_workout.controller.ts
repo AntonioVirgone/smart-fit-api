@@ -33,6 +33,12 @@ export class HistoryWorkoutController {
     return this.historyWorkoutService.findAll(customerId);
   }
 
+  @Get()
+  async find() {
+    console.log('find');
+    return this.historyWorkoutService.find();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.historyWorkoutService.findOne(+id);
