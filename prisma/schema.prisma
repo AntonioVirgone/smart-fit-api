@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  customerId    String   @default("xxx")
-  username      String   @unique
+  id            Int       @id @default(autoincrement())
+  customerId    String?
+  username      String    @unique
   password      String
-  email         String   @unique
-  type          String   @default("CONSUMER")
+  email         String    @unique
+  type          String    @default("CONSUMER")
   refreshToken  String?
   codeValidator String?
-  status        String   @default("INACTIVE")
-  createdAt     DateTime @default(now())
+  status        String    @default("INACTIVE")
+  createdAt     DateTime  @default(now())
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 }
 
 model History {
@@ -28,6 +30,10 @@ model History {
   dataSize   Int      @default(0)
   status     String   @default("pending")
   createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
 }
 
 model Workout {
@@ -61,6 +67,7 @@ model Exercise {
   instructions String[]
 
   planExercises PlanExercise[]
+  historyWorkouts HistoryWorkout[]
 }
 
 model WorkoutPlan {
@@ -93,16 +100,22 @@ model PlanExercise {
 }
 
 model HistoryWorkout {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   customerId  String
   exerciseId  String
   repetitions Int
-  weight      Decimal  @db.Decimal(5, 2)
+  weight      Decimal   @db.Decimal(5, 2)
   notes       String
-  type        String   @default("series")
-  intensity   String   @default("light")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  type        String    @default("series")
+  intensity   String    @default("light")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([exerciseId])
 }
 
 model Customer {
@@ -119,18 +132,25 @@ model Customer {
   Trainer        Trainer?          @relation(fields: [trainerId], references: [id])
   trainerId      String?
   DeviceToken    DeviceToken[]
+
+  profile        CustomerProfile?
+  histories      History[]
+  historyWorkouts HistoryWorkout[]
+  users          User[]
 }
 
 model CustomerProfile {
-  id           String   @id @default(uuid())
-  customerCode String
-  name         String
-  lastname     String
-  age          Int
-  weight       Int
-  height       Decimal  @db.Decimal(5, 2)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(uuid())
+  customerId String   @unique
+  name       String
+  lastname   String
+  age        Int
+  weight     Int
+  height     Decimal  @db.Decimal(5, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model CustomerWorkout {

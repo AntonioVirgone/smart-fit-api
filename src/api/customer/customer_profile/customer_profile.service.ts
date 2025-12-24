@@ -12,10 +12,10 @@ export class CustomerProfileService {
   ) {}
 
   async create(
-    customerCode: string,
+    customerId: string,
     createCustomerProfileDto: CreateCustomerProfileDto,
   ) {
-    const user = await this.customerService.isActive(customerCode);
+    const user = await this.customerService.isActive(customerId);
 
     if (!user) {
       throw new NotFoundException('Utente non attivo');
@@ -23,7 +23,7 @@ export class CustomerProfileService {
 
     return this.prisma.customerProfile.create({
       data: {
-        customerCode: customerCode,
+        customerId: customerId,
         name: createCustomerProfileDto.name,
         lastname: createCustomerProfileDto.lastname,
         age: createCustomerProfileDto.age,
@@ -34,11 +34,16 @@ export class CustomerProfileService {
   }
 
   findAll() {
-    return this.prisma.customerProfile.findMany();
+    return this.prisma.customerProfile.findMany({
+      include: { customer: true },
+    });
   }
 
   findOne(id: string) {
-    return this.prisma.customerProfile.findUnique({ where: { id } });
+    return this.prisma.customerProfile.findUnique({
+      where: { id },
+      include: { customer: true },
+    });
   }
 
   update(id: string, updateCustomerProfileDto: UpdateCustomerProfileDto) {
