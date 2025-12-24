@@ -13,18 +13,14 @@ export class HistoryWorkoutService {
     createHistoryWorkoutDto: Required<CreateHistoryWorkoutDto>,
   ) {
     const data: Prisma.HistoryWorkoutCreateInput = {
-      customerId: customerId,
-      exerciseId: createHistoryWorkoutDto.exerciseId,
+      customer: { connect: { id: customerId } },
+      exercise: { connect: { id: createHistoryWorkoutDto.exerciseId } },
       repetitions: createHistoryWorkoutDto.repetitions,
       weight: createHistoryWorkoutDto.weight,
       notes: createHistoryWorkoutDto.notes,
       type: createHistoryWorkoutDto.type,
+      intensity: createHistoryWorkoutDto.intensity,
     };
-
-    // aggiunto solo se presente
-    if (createHistoryWorkoutDto.intensity !== undefined) {
-      data.intensity = createHistoryWorkoutDto.intensity;
-    }
 
     return this.prisma.historyWorkout.create({ data });
   }

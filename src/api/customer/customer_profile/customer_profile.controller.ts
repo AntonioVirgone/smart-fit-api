@@ -17,13 +17,13 @@ export class CustomerProfileController {
     private readonly customerProfileService: CustomerProfileService,
   ) {}
 
-  @Post(':customerCode')
+  @Post(':customerId')
   create(
-    @Param('customerCode') customerCode: string,
+    @Param('customerId') customerId: string,
     @Body() createCustomerProfileDto: CreateCustomerProfileDto,
   ) {
     return this.customerProfileService.create(
-      customerCode,
+      customerId,
       createCustomerProfileDto,
     );
   }

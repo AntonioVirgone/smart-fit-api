@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RefreshTokenDto } from '../users/dto/refresh-token.dto';
 import { LoginUserDto } from '../users/dto/login-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -18,6 +19,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(AuthGuard('jwt'))
   async logout(@Req() req) {
     // req.user.id arriva da JWT guard
     return this.authService.logout(req.user.sub);

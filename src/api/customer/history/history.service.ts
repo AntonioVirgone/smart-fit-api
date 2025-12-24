@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { History } from '@prisma/client';
+import { History, Prisma } from '@prisma/client';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { SaveJsonDto } from './dto/save-json.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -14,18 +14,20 @@ export class HistoryService {
   ): Promise<History> {
     const createHistoryDto: CreateHistoryDto = {
       customerId: customerId,
-      json_data: saveJsonDto.jsonData,
+      jsonData: saveJsonDto.jsonData,
       filename: saveJsonDto.filename || 'unknown.json',
-      data_size: JSON.stringify(saveJsonDto.jsonData).length,
+      dataSize: JSON.stringify(saveJsonDto.jsonData).length,
       status: saveJsonDto.status || 'completed',
     };
+    const data: Prisma.HistoryUncheckedCreateInput = {
+      customerId: createHistoryDto.customerId,
+      jsonData: createHistoryDto.jsonData,
+      filename: createHistoryDto.filename,
+      dataSize: createHistoryDto.dataSize,
+      status: createHistoryDto.status,
+    };
 
-    const stringaJSON = JSON.stringify(createHistoryDto);
-    const stringaUnita = 'Prepare element to save: ' + stringaJSON;
-
-    console.log(stringaUnita);
-
-    return await this.prisma.history.create({ data: createHistoryDto });
+    return await this.prisma.history.create({ data });
   }
 
   async findAll(): Promise<History[]> {

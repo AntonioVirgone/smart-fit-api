@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from '../mail/mail.service';
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import crypto from 'crypto';
@@ -23,7 +22,6 @@ export class UsersService {
 
     const user = await this.prisma.user.create({
       data: {
-        customerId: uuidv4(),
         username: createUserDto.username,
         password: hashedPassword,
         email: createUserDto.email,
