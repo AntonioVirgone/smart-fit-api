@@ -16,6 +16,9 @@ import { TrainerModule } from './api/trainer/trainer/trainer.module';
 import { HealthModule } from './health.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { HistoryWorkoutModule } from './api/customer/history_workout/history_workout.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -30,6 +33,12 @@ import { HistoryWorkoutModule } from './api/customer/history_workout/history_wor
         signOptions: { expiresIn: '1h' },
       }),
       inject: [ConfigService],
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // genera lo schema da classi TS
+      sortSchema: true,
+      playground: true, // ok in dev
     }),
     PrismaModule,
     HealthModule,

@@ -1,0 +1,33 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type HistoryType {
+  date: DateTime!
+  id: ID!
+  note: String
+}
+
+type Query {
+  historyWorkout: [HistoryType!]!
+  workoutHistory: [WorkoutHistoryType!]!
+  workoutHistoryByCustomer(customerId: ID!): [WorkoutHistoryType!]!
+}
+
+type WorkoutHistoryType {
+  createdAt: DateTime!
+  customerId: ID!
+  exerciseId: ID!
+  id: ID!
+  intensity: String!
+  notes: String
+  repetitions: Float!
+  type: String!
+  updatedAt: DateTime!
+  weight: String!
+}
