@@ -5,7 +5,7 @@ export class CreateHistoryDto {
   customerId: string;
 
   @IsObject()
-  json_data: any;
+  jsonData: any;
 
   @IsString()
   @IsOptional()
@@ -13,7 +13,7 @@ export class CreateHistoryDto {
 
   @IsNumber()
   @IsOptional()
-  data_size?: number;
+  dataSize?: number;
 
   @IsString()
   @IsOptional()

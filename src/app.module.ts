@@ -16,6 +16,10 @@ import { TrainerModule } from './api/trainer/trainer/trainer.module';
 import { HealthModule } from './health.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { HistoryWorkoutModule } from './api/customer/history_workout/history_workout.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { GraphqlModule } from './graphql/graphql.module';
 
 @Module({
   imports: [
@@ -36,6 +40,12 @@ import { HistoryWorkoutModule } from './api/customer/history_workout/history_wor
     HistoryModule,
     UsersModule,
     AuthModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      context: ({ req }) => ({ req }),
+    }),
     WorkoutModule,
     MailModule,
     NotificationsModule,
@@ -46,6 +56,7 @@ import { HistoryWorkoutModule } from './api/customer/history_workout/history_wor
     CustomerProfileModule,
     TrainerModule,
     HistoryWorkoutModule,
+    GraphqlModule,
   ],
 })
 export class AppModule {}
