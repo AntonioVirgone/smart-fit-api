@@ -7,5 +7,7 @@ import { CustomersService } from '../../customer/customers/customers.service';
 @Module({
   providers: [TrainerService, PrismaService, CustomersService],
   controllers: [TrainerController],
+  exports: [TrainerService], // ✅ fondamentale
+
 })
 export class TrainerModule {}

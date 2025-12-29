@@ -1,9 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import {
-  WorkoutModel,
-  PlanModel,
-  ExerciseModel,
-} from '../models/gql-types';
+import { WorkoutModel, PlanModel, ExerciseModel } from '../models/gql-types';
 import {
   AddExerciseToPlanInput,
   AddPlanToWorkoutInput,

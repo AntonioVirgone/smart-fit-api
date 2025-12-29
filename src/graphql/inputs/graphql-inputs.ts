@@ -1,5 +1,7 @@
 import { Field, Float, ID, InputType, Int } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-type-json';
+import { WorkoutType } from '../../api/customer/history_workout/enum/workout-type.enum';
+import { WorkoutIntensity } from '../../api/customer/history_workout/enum/workout-intensity.enum';
 
 @InputType()
 export class LoginInput {
@@ -84,20 +86,20 @@ export class HistoryWorkoutInput {
   @Field()
   notes: string;
 
-  @Field({ defaultValue: 'series' })
-  type?: string;
+  @Field(() => WorkoutType, { defaultValue: WorkoutType.Series })
+  type!: WorkoutType;
 
-  @Field({ nullable: true })
-  intensity?: string;
+  @Field(() => WorkoutIntensity)
+  intensity!: WorkoutIntensity;
 }
 
 @InputType()
-export class CreateWorkoutInput {
-  @Field()
-  name: string;
+export class CreateHistoryWorkoutInput {
+  @Field(() => WorkoutType)
+  type!: WorkoutType;
 
-  @Field(() => [ID])
-  plans: string[];
+  @Field(() => WorkoutIntensity)
+  intensity!: WorkoutIntensity;
 }
 
 @InputType()
@@ -179,10 +181,24 @@ export class TrainerLoginInput {
 export class CreateCustomerInput {
   @Field()
   name: string;
-
   @Field()
-  email: string;
+  phoneNumber!: string;
+  @Field()
+  email!: string;
+}
+
+@InputType()
+export class CreateWorkoutInput {
+  @Field()
+  name!: string;
 
   @Field({ nullable: true })
-  phoneNumber?: string;
+  description?: string;
+
+  /**
+   * Giorni / varianti del workout (A, B, C, ecc.)
+   * Es: ["A", "B", "C"]
+   */
+  @Field(() => [String])
+  plans!: string[];
 }
